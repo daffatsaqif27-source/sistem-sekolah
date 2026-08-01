@@ -207,6 +207,10 @@
         <input type="text" id="new-school-id-input" placeholder="Contoh: SKL003">
         <label for="new-school-nama-input">Nama Sekolah</label>
         <input type="text" id="new-school-nama-input" placeholder="Contoh: SD Contoh Baru">
+        <label for="new-school-wa-input">No. WA Admin Sekolah</label>
+        <input type="text" id="new-school-wa-input" placeholder="Contoh: 628123456789">
+        <label for="new-school-bendahara-input">Nama Bendahara/Admin</label>
+        <input type="text" id="new-school-bendahara-input" placeholder="Contoh: Bu Sari">
         <label for="kode-akses-developer-konfirmasi-1">Konfirmasi Kode Akses Developer</label>
         <input type="text" id="kode-akses-developer-konfirmasi-1" placeholder="Wajib diisi">
         <button class="btn-primary" id="simpan-sekolah-baru-btn">Buat Sekolah</button>
@@ -540,6 +544,8 @@ document.getElementById('toggle-tambah-sekolah-btn').addEventListener('click', (
 document.getElementById('simpan-sekolah-baru-btn').addEventListener('click', async () => {
   const schoolId = document.getElementById('new-school-id-input').value.trim();
   const nama = document.getElementById('new-school-nama-input').value.trim();
+  const noWa = document.getElementById('new-school-wa-input').value.trim();
+  const bendahara = document.getElementById('new-school-bendahara-input').value.trim();
   const kodeDev = document.getElementById('kode-akses-developer-konfirmasi-1').value.trim();
   const errorBox = document.getElementById('tambah-sekolah-error');
   const successBox = document.getElementById('tambah-sekolah-success');
@@ -548,7 +554,7 @@ document.getElementById('simpan-sekolah-baru-btn').addEventListener('click', asy
   successBox.style.display = 'none';
 
   if (!schoolId || !nama || !kodeDev) {
-    errorBox.textContent = 'Isi semua field dulu.';
+    errorBox.textContent = 'Isi minimal Kode Sekolah, Nama Sekolah, dan Konfirmasi Kode Akses.';
     errorBox.style.display = 'block';
     return;
   }
@@ -564,14 +570,16 @@ document.getElementById('simpan-sekolah-baru-btn').addEventListener('click', asy
     const res = await fetch(`${API_BASE}/dev-kelola-sekolah`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'create', kode_akses: kodeDev, school_id: schoolId, nama_sekolah: nama, kode_akses_admin: kodeAksesAdminBaru, status_langganan: 'aktif' })
+      body: JSON.stringify({ action: 'create', kode_akses: kodeDev, school_id: schoolId, nama_sekolah: nama, kode_akses_admin: kodeAksesAdminBaru, status_langganan: 'aktif', kontak_admin_wa: noWa, nama_bendahara: bendahara })
     });
     const data = await res.json();
     if (data.success) {
-      successBox.textContent = `Sekolah dibuat! Kode akses admin: ${kodeAksesAdminBaru} (catat, gak ditampilin lagi)`;
+      successBox.innerHTML = `✅ Sekolah "${escapeHtml(nama)}" (${escapeHtml(schoolId)}) berhasil dibuat.<br><br><strong>⚠️ CATAT SEKARANG, gak akan ditampilin lagi:</strong><br>Kode Akses Admin: <strong class="mono">${kodeAksesAdminBaru}</strong><br>Segera kirim ke admin sekolah lewat WA.`;
       successBox.style.display = 'block';
       document.getElementById('new-school-id-input').value = '';
       document.getElementById('new-school-nama-input').value = '';
+      document.getElementById('new-school-wa-input').value = '';
+      document.getElementById('new-school-bendahara-input').value = '';
       document.getElementById('kode-akses-developer-konfirmasi-1').value = '';
     } else {
       errorBox.textContent = data.message || 'Gagal membuat sekolah.';
