@@ -53,6 +53,7 @@
   .login-sub { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 26px; line-height: 1.55; }
   label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); margin-bottom: 7px; }
   input[type=password] { width: 100%; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: var(--radius-md); font-size: 15px; font-family: inherit; background: var(--bg); color: var(--ink); margin-bottom: 18px; outline: none; }
+  select { width: 100%; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: var(--radius-md); font-size: 15px; font-family: inherit; background: var(--bg); color: var(--ink); margin-bottom: 18px; }
   input:focus { border-color: var(--primary); }
   button { font-family: inherit; cursor: pointer; border: none; }
   .btn-primary { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; padding: 14px; border-radius: var(--radius-pill); font-size: 15px; font-weight: 700; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 8px 20px rgba(124,58,237,0.35); }
@@ -95,6 +96,18 @@
   .badge { font-size: 10.5px; font-weight: 700; padding: 5px 10px; border-radius: var(--radius-pill); white-space: nowrap; animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
   .badge-aktif { background: var(--success-soft); color: var(--success); }
   .badge-nonaktif { background: var(--danger-soft); color: var(--danger); }
+  .badge-lunas { background: var(--success-soft); color: var(--success); }
+  .badge-belum-bayar { background: var(--danger-soft); color: var(--danger); }
+  .badge-belum-ditagih { background: #EEEEEE; color: var(--ink-soft); }
+  .link-bayar-langganan { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 12px; color: var(--primary); font-weight: 700; }
+  .btn-reset-pw {
+    font-size: 10.5px; font-weight: 700; padding: 5px 10px; border-radius: var(--radius-pill);
+    background: var(--bg); color: var(--ink-soft); border: 1px solid var(--border);
+    transition: background 0.15s, transform 0.15s;
+  }
+  .btn-reset-pw:hover { background: var(--border); }
+  .btn-reset-pw:active { transform: scale(0.96); }
+  .sekolah-edit-panel { background: var(--bg); border-radius: var(--radius-md); padding: 16px; margin: -6px 0 12px; animation: fadeSlideUp 0.3s cubic-bezier(0.16,1,0.3,1); }
 
   .log-detail { font-size: 13.5px; font-weight: 600; }
   .log-meta { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
@@ -163,6 +176,9 @@
     <button class="tab-btn" data-view="log-view">
       <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M12 20V4"/><path d="M20 20v-7"/><path d="M2 20h20"/></svg>Log Global
     </button>
+    <button class="tab-btn" data-view="penagihan-view">
+      <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1"/></svg>Penagihan
+    </button>
     <button class="tab-btn" data-view="settings-view">
       <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Pengaturan
     </button>
@@ -177,17 +193,41 @@
     </div>
 
     <div class="view" id="sekolah-view">
-      <div class="section-label">
-        <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/><path d="M10 21v-4h4v4"/></svg>Semua Sekolah
+      <div class="section-label" style="justify-content:space-between">
+        <span style="display:flex; align-items:center; gap:6px;">
+          <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/><path d="M10 21v-4h4v4"/></svg>Semua Sekolah
+        </span>
+        <button class="btn-reset-pw" id="toggle-tambah-sekolah-btn" style="padding:6px 12px;">+ Tambah Sekolah</button>
       </div>
+
+      <div class="card" id="tambah-sekolah-card" style="display:none">
+        <div class="alert-box alert-error" id="tambah-sekolah-error"></div>
+        <div class="alert-box alert-success" id="tambah-sekolah-success"></div>
+        <label for="new-school-id-input">Kode Sekolah (unik, huruf/angka, tanpa spasi)</label>
+        <input type="text" id="new-school-id-input" placeholder="Contoh: SKL003">
+        <label for="new-school-nama-input">Nama Sekolah</label>
+        <input type="text" id="new-school-nama-input" placeholder="Contoh: SD Contoh Baru">
+        <label for="kode-akses-developer-konfirmasi-1">Konfirmasi Kode Akses Developer</label>
+        <input type="text" id="kode-akses-developer-konfirmasi-1" placeholder="Wajib diisi">
+        <button class="btn-primary" id="simpan-sekolah-baru-btn">Buat Sekolah</button>
+      </div>
+
       <div id="sekolah-list"></div>
     </div>
+
 
     <div class="view" id="log-view">
       <div class="section-label">
         <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M12 20V4"/><path d="M20 20v-7"/><path d="M2 20h20"/></svg>Log Aktivitas Seluruh Sistem (50 Terakhir)
       </div>
       <div id="log-list"></div>
+    </div>
+
+    <div class="view" id="penagihan-view">
+      <div class="section-label">
+        <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1"/></svg>Penagihan Langganan ke Sekolah (Bulan Ini)
+      </div>
+      <div id="penagihan-list"></div>
     </div>
 
     <div class="view" id="settings-view">
@@ -204,6 +244,15 @@
 
         <label for="logo-url-input">Link Logo (URL gambar)</label>
         <input type="url" id="logo-url-input" placeholder="https://...">
+
+        <label for="tarif-input">Tarif Langganan (Rp per siswa aktif / bulan)</label>
+        <input type="text" id="tarif-input" placeholder="Contoh: 2500">
+
+        <label for="merchant-id-input">Midtrans Merchant ID (Agentix AI)</label>
+        <input type="text" id="merchant-id-input" placeholder="M-xxxxxxx">
+
+        <label for="server-key-input">Midtrans Server Key (Agentix AI)</label>
+        <input type="text" id="server-key-input" placeholder="SB-Mid-server-xxxxxxx atau Mid-server-xxxxxxx">
 
         <label for="kode-baru-input">Kode Akses Baru (kosongkan kalau gak mau ganti)</label>
         <input type="text" id="kode-baru-input" placeholder="Min. 8 karakter">
@@ -318,7 +367,10 @@ async function doLogin() {
     document.getElementById('app-screen').style.display = 'block';
 
     renderSummary(data.summary || {});
+    state.tarif_per_siswa = data.tarif_per_siswa || 0;
     renderSekolahList(data.sekolah_list || []);
+    renderPenagihan(data.sekolah_list || []);
+    document.getElementById('tarif-input').value = state.tarif_per_siswa || '';
     renderLogGlobal(data.log_aktivitas || []);
     applyLogo(data.logo_url || '');
   } catch (err) {
@@ -357,7 +409,9 @@ function renderSummary(s) {
     { num: s.total_sekolah || 0, label: 'Total Sekolah', icon: 'building' },
     { num: s.total_sekolah_aktif || 0, label: 'Sekolah Aktif', icon: 'check' },
     { num: s.total_siswa || 0, label: 'Total Siswa (Semua Sekolah)', icon: 'users' },
-    { num: 'Rp' + Number(s.total_nominal_terkumpul_bulan_ini || 0).toLocaleString('id-ID'), label: 'Terkumpul Bulan Ini', icon: 'wallet' }
+    { num: 'Rp' + Number(s.total_nominal_terkumpul_bulan_ini || 0).toLocaleString('id-ID'), label: 'SPP Terkumpul Bulan Ini', icon: 'wallet' },
+    { num: 'Rp' + Number(s.total_pendapatan_langganan_bulan_ini || 0).toLocaleString('id-ID'), label: 'Pendapatan Langganan Bulan Ini', icon: 'chart' },
+    { num: s.total_langganan_belum_bayar || 0, label: 'Sekolah Belum Bayar Langganan', icon: 'alert' }
   ];
   document.getElementById('summary-grid').innerHTML = cards.map((c, i) => `
     <div class="summary-card" style="animation-delay: ${i * 0.06}s">
@@ -368,14 +422,19 @@ function renderSummary(s) {
   `).join('');
 }
 
+let sekolahDataById = {};
+
 function renderSekolahList(list) {
   const container = document.getElementById('sekolah-list');
+  sekolahDataById = {};
+  list.forEach(s => { sekolahDataById[s.school_id] = s; });
+
   if (!list.length) {
     container.innerHTML = `<div class="empty-state">${ic('building', 40, '#6B7280')}<div>Belum ada sekolah terdaftar.</div></div>`;
     return;
   }
   container.innerHTML = list.map((s, i) => `
-    <div class="sekolah-row" style="animation-delay: ${i * 0.05}s">
+    <div class="sekolah-row" style="animation-delay: ${i * 0.05}s; cursor:pointer;" data-school-id="${escapeHtml(s.school_id)}">
       <div class="sekolah-left">
         <div class="sekolah-icon">${ic('building', 17, '#7C3AED')}</div>
         <div>
@@ -385,7 +444,180 @@ function renderSekolahList(list) {
       </div>
       <span class="badge ${s.status_langganan === 'aktif' ? 'badge-aktif' : 'badge-nonaktif'}">${escapeHtml(s.status_langganan)}</span>
     </div>
+    <div class="sekolah-edit-panel" id="edit-panel-${escapeHtml(s.school_id)}" style="display:none"></div>
   `).join('');
+
+  container.querySelectorAll('.sekolah-row').forEach(row => {
+    row.addEventListener('click', () => toggleEditPanel(row.dataset.schoolId));
+  });
+}
+
+function toggleEditPanel(schoolId) {
+  const panel = document.getElementById(`edit-panel-${schoolId}`);
+  const isOpen = panel.style.display !== 'none';
+  document.querySelectorAll('.sekolah-edit-panel').forEach(p => p.style.display = 'none');
+  if (isOpen) return;
+
+  const s = sekolahDataById[schoolId];
+  panel.innerHTML = `
+    <div class="alert-box alert-error" id="edit-error-${schoolId}"></div>
+    <div class="alert-box alert-success" id="edit-success-${schoolId}"></div>
+    <label>Status Langganan</label>
+    <select id="edit-status-${schoolId}">
+      <option value="aktif" ${s.status_langganan === 'aktif' ? 'selected' : ''}>Aktif</option>
+      <option value="nonaktif" ${s.status_langganan !== 'aktif' ? 'selected' : ''}>Nonaktif</option>
+    </select>
+    <label>Kode Akses Admin Sekolah</label>
+    <div style="display:flex; gap:8px;">
+      <input type="text" id="edit-kode-${schoolId}" placeholder="Kosongkan kalau gak mau ganti" style="flex:1">
+      <button type="button" class="btn-reset-pw" data-generate-for="${schoolId}" style="flex-shrink:0; padding:0 14px;">Buat Acak</button>
+    </div>
+    <label>Warna Tema (hex)</label>
+    <input type="text" id="edit-warna-${schoolId}" placeholder="#4F46E5" value="${escapeHtml(s.warna_tema || '')}">
+    <label>Link Logo</label>
+    <input type="url" id="edit-logo-${schoolId}" placeholder="https://..." value="${escapeHtml(s.logo_url || '')}">
+    <label>Konfirmasi Kode Akses Developer</label>
+    <input type="text" id="edit-kode-dev-${schoolId}" placeholder="Wajib diisi">
+    <button class="btn-primary" data-save-for="${schoolId}">Simpan Perubahan</button>
+  `;
+  panel.style.display = 'block';
+
+  panel.querySelector(`[data-generate-for="${schoolId}"]`).addEventListener('click', () => {
+    const bytes = new Uint8Array(9);
+    crypto.getRandomValues(bytes);
+    const kode = btoa(String.fromCharCode(...bytes)).replace(/[+/=]/g, '').slice(0, 10);
+    document.getElementById(`edit-kode-${schoolId}`).value = kode;
+  });
+
+  panel.querySelector(`[data-save-for="${schoolId}"]`).addEventListener('click', () => simpanEditSekolah(schoolId));
+}
+
+async function simpanEditSekolah(schoolId) {
+  const status = document.getElementById(`edit-status-${schoolId}`).value;
+  const kodeAdmin = document.getElementById(`edit-kode-${schoolId}`).value.trim();
+  const warna = document.getElementById(`edit-warna-${schoolId}`).value.trim();
+  const logo = document.getElementById(`edit-logo-${schoolId}`).value.trim();
+  const kodeDev = document.getElementById(`edit-kode-dev-${schoolId}`).value.trim();
+  const errorBox = document.getElementById(`edit-error-${schoolId}`);
+  const successBox = document.getElementById(`edit-success-${schoolId}`);
+  errorBox.style.display = 'none';
+  successBox.style.display = 'none';
+
+  if (!kodeDev) {
+    errorBox.textContent = 'Konfirmasi kode akses developer dulu.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  const payload = { action: 'update', kode_akses: kodeDev, school_id: schoolId, status_langganan: status, warna_tema: warna, logo_url: logo };
+  if (kodeAdmin) payload.kode_akses_admin = kodeAdmin;
+
+  try {
+    const res = await fetch(`${API_BASE}/dev-kelola-sekolah`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      successBox.textContent = data.message;
+      successBox.style.display = 'block';
+    } else {
+      errorBox.textContent = data.message || 'Gagal menyimpan.';
+      errorBox.style.display = 'block';
+    }
+  } catch (err) {
+    errorBox.textContent = 'Gagal menghubungi server.';
+    errorBox.style.display = 'block';
+  }
+}
+
+document.getElementById('toggle-tambah-sekolah-btn').addEventListener('click', () => {
+  const card = document.getElementById('tambah-sekolah-card');
+  card.style.display = card.style.display === 'none' ? 'block' : 'none';
+});
+
+document.getElementById('simpan-sekolah-baru-btn').addEventListener('click', async () => {
+  const schoolId = document.getElementById('new-school-id-input').value.trim();
+  const nama = document.getElementById('new-school-nama-input').value.trim();
+  const kodeDev = document.getElementById('kode-akses-developer-konfirmasi-1').value.trim();
+  const errorBox = document.getElementById('tambah-sekolah-error');
+  const successBox = document.getElementById('tambah-sekolah-success');
+  const btn = document.getElementById('simpan-sekolah-baru-btn');
+  errorBox.style.display = 'none';
+  successBox.style.display = 'none';
+
+  if (!schoolId || !nama || !kodeDev) {
+    errorBox.textContent = 'Isi semua field dulu.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  const bytes = new Uint8Array(9);
+  crypto.getRandomValues(bytes);
+  const kodeAksesAdminBaru = btoa(String.fromCharCode(...bytes)).replace(/[+/=]/g, '').slice(0, 10);
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Membuat...';
+
+  try {
+    const res = await fetch(`${API_BASE}/dev-kelola-sekolah`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create', kode_akses: kodeDev, school_id: schoolId, nama_sekolah: nama, kode_akses_admin: kodeAksesAdminBaru, status_langganan: 'aktif' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      successBox.textContent = `Sekolah dibuat! Kode akses admin: ${kodeAksesAdminBaru} (catat, gak ditampilin lagi)`;
+      successBox.style.display = 'block';
+      document.getElementById('new-school-id-input').value = '';
+      document.getElementById('new-school-nama-input').value = '';
+      document.getElementById('kode-akses-developer-konfirmasi-1').value = '';
+    } else {
+      errorBox.textContent = data.message || 'Gagal membuat sekolah.';
+      errorBox.style.display = 'block';
+    }
+  } catch (err) {
+    errorBox.textContent = 'Gagal menghubungi server.';
+    errorBox.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Buat Sekolah';
+});
+
+function renderPenagihan(list) {
+  const container = document.getElementById('penagihan-list');
+  if (!list.length) {
+    container.innerHTML = `<div class="empty-state">${ic('building', 40, '#6B7280')}<div>Belum ada sekolah terdaftar.</div></div>`;
+    return;
+  }
+  container.innerHTML = list.map((s, i) => {
+    const p = s.penagihan;
+    let badgeClass = 'badge-belum-ditagih';
+    let badgeText = 'Belum ditagih';
+    let linkBayar = '';
+    if (p) {
+      badgeClass = p.status === 'lunas' ? 'badge-lunas' : 'badge-belum-bayar';
+      badgeText = p.status === 'lunas' ? 'Lunas' : 'Belum bayar';
+      if (p.status !== 'lunas' && p.midtrans_snap_url) {
+        linkBayar = `<a class="link-bayar-langganan" href="${escapeHtml(p.midtrans_snap_url)}" target="_blank" rel="noopener">Link bayar ${ic('arrow-right', 12, '#7C3AED')}</a>`;
+      }
+    }
+    const nominal = p ? p.nominal : (s.jumlah_siswa * (state.tarif_per_siswa || 0));
+    return `
+      <div class="sekolah-row" style="animation-delay: ${i * 0.05}s">
+        <div class="sekolah-left">
+          <div class="sekolah-icon">${ic('wallet', 17, '#7C3AED')}</div>
+          <div>
+            <div class="sekolah-nama">${escapeHtml(s.nama_sekolah)}</div>
+            <div class="sekolah-meta">${s.jumlah_siswa} siswa &middot; Rp${Number(nominal).toLocaleString('id-ID')}${linkBayar}</div>
+          </div>
+        </div>
+        <span class="badge ${badgeClass}">${badgeText}</span>
+      </div>
+    `;
+  }).join('');
 }
 
 const JENIS_LABEL = {
@@ -421,6 +653,9 @@ function renderLogGlobal(list) {
 
 document.getElementById('simpan-settings-btn').addEventListener('click', async () => {
   const logoUrl = document.getElementById('logo-url-input').value.trim();
+  const tarif = document.getElementById('tarif-input').value.trim();
+  const merchantId = document.getElementById('merchant-id-input').value.trim();
+  const serverKey = document.getElementById('server-key-input').value.trim();
   const kodeBaru = document.getElementById('kode-baru-input').value.trim();
   const kodeLama = document.getElementById('kode-lama-konfirmasi-input').value.trim();
   const errorBox = document.getElementById('settings-error');
@@ -438,11 +673,16 @@ document.getElementById('simpan-settings-btn').addEventListener('click', async (
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Menyimpan...';
 
+  const payload = { kode_akses_lama: kodeLama, kode_akses_baru: kodeBaru, logo_url: logoUrl };
+  if (tarif) payload.tarif_per_siswa = Number(tarif);
+  if (merchantId) payload.agentix_midtrans_merchant_id = merchantId;
+  if (serverKey) payload.agentix_midtrans_server_key = serverKey;
+
   try {
     const res = await fetch(`${API_BASE}/dev-update-settings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ kode_akses_lama: kodeLama, kode_akses_baru: kodeBaru, logo_url: logoUrl })
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
 
@@ -451,6 +691,7 @@ document.getElementById('simpan-settings-btn').addEventListener('click', async (
       successBox.style.display = 'block';
       document.getElementById('kode-lama-konfirmasi-input').value = '';
       document.getElementById('kode-baru-input').value = '';
+      document.getElementById('server-key-input').value = '';
       applyLogo(logoUrl);
     } else {
       errorBox.textContent = data.message || 'Gagal menyimpan pengaturan.';
