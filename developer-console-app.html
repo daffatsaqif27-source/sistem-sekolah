@@ -99,6 +99,18 @@
   .badge-lunas { background: var(--success-soft); color: var(--success); }
   .badge-belum-bayar { background: var(--danger-soft); color: var(--danger); }
   .badge-belum-ditagih { background: #EEEEEE; color: var(--ink-soft); }
+  .badge-setup-kurang { background: var(--warning-soft, #FEF3C7); color: #92650E; font-size: 9.5px; }
+  .badge-urgent { background: var(--danger-soft); color: var(--danger); animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  .link-bayar-langganan { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 12px; color: var(--primary); font-weight: 700; }
+  .btn-retry { font-size: 10.5px; font-weight: 700; padding: 5px 10px; border-radius: var(--radius-pill); background: var(--primary-soft); color: var(--primary); border: none; margin-top: 6px; transition: background 0.15s, transform 0.15s; }
+  .btn-retry:hover { background: #E0DBFF; }
+  .btn-retry:active { transform: scale(0.96); }
+  .sub-toggle { display: flex; gap: 4px; background: var(--surface); padding: 4px; border-radius: var(--radius-pill); box-shadow: var(--shadow-sm); margin-bottom: 16px; width: fit-content; }
+  .sub-toggle-btn { padding: 7px 16px; font-size: 12px; font-weight: 600; color: var(--ink-soft); border-radius: var(--radius-pill); }
+  .sub-toggle-btn.active { color: #fff; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+  .riwayat-row { background: var(--surface); border-radius: var(--radius-lg); padding: 13px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); animation: fadeSlideUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+  .btn-export { font-size: 11.5px; font-weight: 700; padding: 6px 12px; border-radius: var(--radius-pill); background: var(--bg); color: var(--ink-soft); border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 5px; }
+  .btn-export:hover { background: var(--border); }
   .link-bayar-langganan { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 12px; color: var(--primary); font-weight: 700; }
   .btn-reset-pw {
     font-size: 10.5px; font-weight: 700; padding: 5px 10px; border-radius: var(--radius-pill);
@@ -197,7 +209,10 @@
         <span style="display:flex; align-items:center; gap:6px;">
           <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/><path d="M10 21v-4h4v4"/></svg>Semua Sekolah
         </span>
-        <button class="btn-reset-pw" id="toggle-tambah-sekolah-btn" style="padding:6px 12px;">+ Tambah Sekolah</button>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-export" id="export-sekolah-csv-btn"><svg class="icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>CSV</button>
+          <button class="btn-reset-pw" id="toggle-tambah-sekolah-btn" style="padding:6px 12px;">+ Tambah Sekolah</button>
+        </div>
       </div>
 
       <div class="card" id="tambah-sekolah-card" style="display:none">
@@ -207,6 +222,8 @@
         <input type="text" id="new-school-id-input" placeholder="Contoh: SKL003">
         <label for="new-school-nama-input">Nama Sekolah</label>
         <input type="text" id="new-school-nama-input" placeholder="Contoh: SD Contoh Baru">
+        <label for="new-school-alamat-input">Alamat Sekolah</label>
+        <input type="text" id="new-school-alamat-input" placeholder="Contoh: Jl. Merdeka No. 10, Madiun">
         <label for="new-school-wa-input">No. WA Admin Sekolah</label>
         <input type="text" id="new-school-wa-input" placeholder="Contoh: 628123456789">
         <label for="new-school-bendahara-input">Nama Bendahara/Admin</label>
@@ -228,10 +245,24 @@
     </div>
 
     <div class="view" id="penagihan-view">
-      <div class="section-label">
-        <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1"/></svg>Penagihan Langganan ke Sekolah (Bulan Ini)
+      <div class="section-label" style="justify-content:space-between">
+        <span style="display:flex; align-items:center; gap:6px;">
+          <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1"/></svg>Penagihan Langganan
+        </span>
+        <button class="btn-export" id="export-penagihan-csv-btn"><svg class="icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>CSV</button>
       </div>
-      <div id="penagihan-list"></div>
+
+      <div class="sub-toggle">
+        <button class="sub-toggle-btn active" data-sub="bulan-ini">Bulan Ini</button>
+        <button class="sub-toggle-btn" data-sub="riwayat">Riwayat</button>
+      </div>
+
+      <div id="penagihan-bulan-ini-sub">
+        <div id="penagihan-list"></div>
+      </div>
+      <div id="penagihan-riwayat-sub" style="display:none">
+        <div id="riwayat-list"></div>
+      </div>
     </div>
 
     <div class="view" id="settings-view">
@@ -367,6 +398,7 @@ async function doLogin() {
     }
 
     state = data;
+    state.kodeAkses = kode;
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-screen').style.display = 'block';
 
@@ -413,9 +445,10 @@ function renderSummary(s) {
     { num: s.total_sekolah || 0, label: 'Total Sekolah', icon: 'building' },
     { num: s.total_sekolah_aktif || 0, label: 'Sekolah Aktif', icon: 'check' },
     { num: s.total_siswa || 0, label: 'Total Siswa (Semua Sekolah)', icon: 'users' },
-    { num: 'Rp' + Number(s.total_nominal_terkumpul_bulan_ini || 0).toLocaleString('id-ID'), label: 'SPP Terkumpul Bulan Ini', icon: 'wallet' },
+    { num: 'Rp' + Number(s.total_nominal_terkumpul_bulan_ini || 0).toLocaleString('id-ID'), label: 'Volume SPP Terkumpul (milik sekolah, bukan Agentix)', icon: 'wallet' },
     { num: 'Rp' + Number(s.total_pendapatan_langganan_bulan_ini || 0).toLocaleString('id-ID'), label: 'Pendapatan Langganan Bulan Ini', icon: 'chart' },
-    { num: s.total_langganan_belum_bayar || 0, label: 'Sekolah Belum Bayar Langganan', icon: 'alert' }
+    { num: s.total_langganan_belum_bayar || 0, label: 'Sekolah Belum Bayar Langganan', icon: 'alert' },
+    { num: s.total_sekolah_setup_kurang || 0, label: 'Sekolah Setup Belum Lengkap', icon: 'help' }
   ];
   document.getElementById('summary-grid').innerHTML = cards.map((c, i) => `
     <div class="summary-card" style="animation-delay: ${i * 0.06}s">
@@ -443,7 +476,8 @@ function renderSekolahList(list) {
         <div class="sekolah-icon">${ic('building', 17, '#7C3AED')}</div>
         <div>
           <div class="sekolah-nama">${escapeHtml(s.nama_sekolah)}</div>
-          <div class="sekolah-meta">${escapeHtml(s.school_id)} &middot; ${s.jumlah_siswa} siswa &middot; Rp${Number(s.nominal_terkumpul_bulan_ini || 0).toLocaleString('id-ID')} terkumpul</div>
+          <div class="sekolah-meta">${escapeHtml(s.school_id)} &middot; ${s.jumlah_siswa} siswa &middot; Rp${Number(s.nominal_terkumpul_bulan_ini || 0).toLocaleString('id-ID')} terkumpul${s.alamat ? ' &middot; ' + escapeHtml(s.alamat) : ''}</div>
+          ${s.setup_kurang && s.setup_kurang.length ? `<div style="margin-top:5px;">${s.setup_kurang.map(k => `<span class="badge badge-setup-kurang" style="margin-right:4px;">Kurang: ${escapeHtml(k)}</span>`).join('')}</div>` : ''}
         </div>
       </div>
       <span class="badge ${s.status_langganan === 'aktif' ? 'badge-aktif' : 'badge-nonaktif'}">${escapeHtml(s.status_langganan)}</span>
@@ -471,6 +505,8 @@ function toggleEditPanel(schoolId) {
       <option value="aktif" ${s.status_langganan === 'aktif' ? 'selected' : ''}>Aktif</option>
       <option value="nonaktif" ${s.status_langganan !== 'aktif' ? 'selected' : ''}>Nonaktif</option>
     </select>
+    <label>Alamat Sekolah</label>
+    <input type="text" id="edit-alamat-${schoolId}" placeholder="Contoh: Jl. Merdeka No. 10, Madiun" value="${escapeHtml(s.alamat || '')}">
     <label>Kode Akses Admin Sekolah</label>
     <div style="display:flex; gap:8px;">
       <input type="text" id="edit-kode-${schoolId}" placeholder="Kosongkan kalau gak mau ganti" style="flex:1">
@@ -513,7 +549,8 @@ async function simpanEditSekolah(schoolId) {
     return;
   }
 
-  const payload = { action: 'update', kode_akses: kodeDev, school_id: schoolId, status_langganan: status, warna_tema: warna, logo_url: logo };
+  const alamat = document.getElementById(`edit-alamat-${schoolId}`).value.trim();
+  const payload = { action: 'update', kode_akses: kodeDev, school_id: schoolId, status_langganan: status, warna_tema: warna, logo_url: logo, alamat: alamat };
   if (kodeAdmin) payload.kode_akses_admin = kodeAdmin;
 
   try {
@@ -544,6 +581,7 @@ document.getElementById('toggle-tambah-sekolah-btn').addEventListener('click', (
 document.getElementById('simpan-sekolah-baru-btn').addEventListener('click', async () => {
   const schoolId = document.getElementById('new-school-id-input').value.trim();
   const nama = document.getElementById('new-school-nama-input').value.trim();
+  const alamat = document.getElementById('new-school-alamat-input').value.trim();
   const noWa = document.getElementById('new-school-wa-input').value.trim();
   const bendahara = document.getElementById('new-school-bendahara-input').value.trim();
   const kodeDev = document.getElementById('kode-akses-developer-konfirmasi-1').value.trim();
@@ -570,7 +608,7 @@ document.getElementById('simpan-sekolah-baru-btn').addEventListener('click', asy
     const res = await fetch(`${API_BASE}/dev-kelola-sekolah`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'create', kode_akses: kodeDev, school_id: schoolId, nama_sekolah: nama, kode_akses_admin: kodeAksesAdminBaru, status_langganan: 'aktif', kontak_admin_wa: noWa, nama_bendahara: bendahara })
+      body: JSON.stringify({ action: 'create', kode_akses: kodeDev, school_id: schoolId, nama_sekolah: nama, kode_akses_admin: kodeAksesAdminBaru, status_langganan: 'aktif', kontak_admin_wa: noWa, nama_bendahara: bendahara, alamat: alamat })
     });
     const data = await res.json();
     if (data.success) {
@@ -578,6 +616,7 @@ document.getElementById('simpan-sekolah-baru-btn').addEventListener('click', asy
       successBox.style.display = 'block';
       document.getElementById('new-school-id-input').value = '';
       document.getElementById('new-school-nama-input').value = '';
+      document.getElementById('new-school-alamat-input').value = '';
       document.getElementById('new-school-wa-input').value = '';
       document.getElementById('new-school-bendahara-input').value = '';
       document.getElementById('kode-akses-developer-konfirmasi-1').value = '';
@@ -605,12 +644,18 @@ function renderPenagihan(list) {
     let badgeClass = 'badge-belum-ditagih';
     let badgeText = 'Belum ditagih';
     let linkBayar = '';
+    let urgensi = '';
+    let tombolRetry = `<button class="btn-retry" data-retry-for="${escapeHtml(s.school_id)}">${p ? 'Coba Lagi' : 'Generate Tagihan'}</button>`;
     if (p) {
       badgeClass = p.status === 'lunas' ? 'badge-lunas' : 'badge-belum-bayar';
       badgeText = p.status === 'lunas' ? 'Lunas' : 'Belum bayar';
       if (p.status !== 'lunas' && p.midtrans_snap_url) {
         linkBayar = `<a class="link-bayar-langganan" href="${escapeHtml(p.midtrans_snap_url)}" target="_blank" rel="noopener">Link bayar ${ic('arrow-right', 12, '#7C3AED')}</a>`;
       }
+      if (p.status !== 'lunas' && p.hari_terlambat !== null && p.hari_terlambat >= 7) {
+        urgensi = `<span class="badge badge-urgent" style="margin-left:6px;">H+${p.hari_terlambat}</span>`;
+      }
+      tombolRetry = p.status === 'lunas' ? '' : `<button class="btn-retry" data-retry-for="${escapeHtml(s.school_id)}">Buat Ulang Link</button>`;
     }
     const nominal = p ? p.nominal : (s.jumlah_siswa * (state.tarif_per_siswa || 0));
     return `
@@ -620,13 +665,111 @@ function renderPenagihan(list) {
           <div>
             <div class="sekolah-nama">${escapeHtml(s.nama_sekolah)}</div>
             <div class="sekolah-meta">${s.jumlah_siswa} siswa &middot; Rp${Number(nominal).toLocaleString('id-ID')}${linkBayar}</div>
+            ${tombolRetry}
           </div>
         </div>
-        <span class="badge ${badgeClass}">${badgeText}</span>
+        <span class="badge ${badgeClass}">${badgeText}</span>${urgensi}
       </div>
     `;
   }).join('');
+
+  container.querySelectorAll('[data-retry-for]').forEach(btn => {
+    btn.addEventListener('click', () => retryTagihan(btn.dataset.retryFor, btn));
+  });
 }
+
+async function retryTagihan(schoolId, btnEl) {
+  const kodeAkses = prompt('Konfirmasi kode akses developer buat generate ulang tagihan:');
+  if (!kodeAkses) return;
+
+  const originalText = btnEl.textContent;
+  btnEl.disabled = true;
+  btnEl.innerHTML = '<span class="spinner"></span>Memproses...';
+
+  try {
+    const res = await fetch(`${API_BASE}/dev-retry-tagihan-langganan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kode_akses: kodeAkses, school_id: schoolId })
+    });
+    const data = await res.json();
+    alert(data.message);
+    if (data.success) { doLogin(); }
+  } catch (err) {
+    alert('Gagal menghubungi server.');
+  }
+
+  btnEl.disabled = false;
+  btnEl.textContent = originalText;
+}
+
+async function loadRiwayatPenagihan() {
+  const container = document.getElementById('riwayat-list');
+  container.innerHTML = `<div class="empty-state">${ic('history', 32, '#6B7280')}<div>Memuat riwayat...</div></div>`;
+
+  try {
+    const res = await fetch(`${API_BASE}/dev-riwayat-penagihan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kode_akses: state.kodeAkses })
+    });
+    const data = await res.json();
+    if (!data.success || !data.riwayat || !data.riwayat.length) {
+      container.innerHTML = `<div class="empty-state">${ic('history', 40, '#6B7280')}<div>Belum ada riwayat penagihan.</div></div>`;
+      return;
+    }
+    container.innerHTML = data.riwayat.map((r, i) => `
+      <div class="riwayat-row" style="animation-delay: ${i * 0.05}s">
+        <div>
+          <div class="sekolah-nama">${escapeHtml(r.bulan)}</div>
+          <div class="sekolah-meta">${r.total_lunas}/${r.total_tagihan} sekolah lunas</div>
+        </div>
+        <div class="summary-num mono" style="font-size:18px;">Rp${Number(r.pendapatan).toLocaleString('id-ID')}</div>
+      </div>
+    `).join('');
+  } catch (err) {
+    container.innerHTML = `<div class="empty-state">${ic('alert', 40, '#EF4444')}<div>Gagal memuat riwayat.</div></div>`;
+  }
+}
+
+document.querySelectorAll('.sub-toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sub-toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const isRiwayat = btn.dataset.sub === 'riwayat';
+    document.getElementById('penagihan-bulan-ini-sub').style.display = isRiwayat ? 'none' : 'block';
+    document.getElementById('penagihan-riwayat-sub').style.display = isRiwayat ? 'block' : 'none';
+    if (isRiwayat) loadRiwayatPenagihan();
+  });
+});
+
+function downloadCSV(filename, rows) {
+  const csv = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById('export-sekolah-csv-btn').addEventListener('click', () => {
+  const rows = [['Kode Sekolah', 'Nama Sekolah', 'Status', 'Jumlah Siswa', 'SPP Terkumpul Bulan Ini', 'Setup Kurang']];
+  Object.values(sekolahDataById).forEach(s => {
+    rows.push([s.school_id, s.nama_sekolah, s.status_langganan, s.jumlah_siswa, s.nominal_terkumpul_bulan_ini || 0, (s.setup_kurang || []).join('; ')]);
+  });
+  downloadCSV(`sekolah-agentix-${new Date().toISOString().slice(0, 10)}.csv`, rows);
+});
+
+document.getElementById('export-penagihan-csv-btn').addEventListener('click', () => {
+  const rows = [['Kode Sekolah', 'Nama Sekolah', 'Jumlah Siswa', 'Nominal', 'Status', 'Hari Terlambat']];
+  Object.values(sekolahDataById).forEach(s => {
+    const p = s.penagihan;
+    rows.push([s.school_id, s.nama_sekolah, s.jumlah_siswa, p ? p.nominal : '-', p ? p.status : 'belum_ditagih', p && p.hari_terlambat !== null ? p.hari_terlambat : '-']);
+  });
+  downloadCSV(`penagihan-agentix-${new Date().toISOString().slice(0, 10)}.csv`, rows);
+});
 
 const JENIS_LABEL = {
   login_admin: 'Login admin',
