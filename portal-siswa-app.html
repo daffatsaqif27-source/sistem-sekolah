@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Portal Siswa &amp; Wali Murid</title>
+<link rel="manifest" id="manifest-link" href="./manifest-portal.json">
+<meta name="theme-color" id="theme-color-meta" content="#1B3A5C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Portal Siswa">
+<link rel="apple-touch-icon" id="apple-icon-link" href="https://api.iconify.design/mdi/account-school.svg?color=%231B3A5C&width=192&height=192">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1B3A5C;
+    --navy-deep: #12283F;
+    --paper: #F6F3EC;
+    --paper-line: #E4DFD1;
+    --ink: #21262B;
+    --ink-soft: #5B6570;
+    --gold: #C9973B;
+    --green: #2F7D5B;
+    --green-soft: #E4F1EA;
+    --red: #C0502D;
+    --red-soft: #F7E7DF;
+    --white: #FFFFFF;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'IBM Plex Sans', sans-serif; min-height: 100vh; }
+  .display { font-family: 'Fraunces', serif; }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  #login-screen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+    background: linear-gradient(var(--navy-deep), var(--navy-deep)), repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(255,255,255,0.035) 28px);
+  }
+  .login-card { background: var(--paper); border-radius: var(--radius); max-width: 380px; width: 100%; padding: 36px 32px; box-shadow: 0 24px 60px rgba(0,0,0,0.35); position: relative; overflow: hidden; }
+  .login-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--gold), var(--navy)); }
+  .login-eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 6px; }
+  .login-title { font-size: 24px; font-weight: 600; color: var(--navy-deep); margin: 0 0 4px; }
+  .login-sub { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 26px; line-height: 1.5; }
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-soft); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+  input[type=text], input[type=password] { width: 100%; padding: 12px 14px; border: 1.5px solid var(--paper-line); border-radius: 8px; font-size: 15px; font-family: inherit; background: var(--white); color: var(--ink); margin-bottom: 18px; outline: none; transition: border-color 0.15s; }
+  input:focus { border-color: var(--navy); }
+  button { font-family: inherit; cursor: pointer; border: none; }
+  .btn-primary { width: 100%; background: var(--navy); color: var(--white); padding: 13px; border-radius: 8px; font-size: 15px; font-weight: 600; transition: background 0.15s; }
+  .btn-primary:hover { background: var(--navy-deep); }
+  .btn-primary:disabled { opacity: 0.5; cursor: default; }
+  .alert-box { font-size: 13px; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; display: none; }
+  .alert-error { background: var(--red-soft); color: var(--red); }
+  .alert-success { background: var(--green-soft); color: var(--green); }
+  .login-hint { font-size: 11.5px; color: var(--ink-soft); margin-top: -10px; margin-bottom: 18px; line-height: 1.5; }
+
+  #app-screen { display: none; min-height: 100vh; }
+  header.topbar { background: var(--navy-deep); color: var(--white); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 20; }
+  .topbar-title { display: flex; flex-direction: column; }
+  .topbar-eyebrow { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  .topbar-nama { font-size: 16px; font-weight: 600; font-family: 'Fraunces', serif; }
+  .btn-logout { background: transparent; color: rgba(255,255,255,0.7); font-size: 12px; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.25); }
+  .btn-logout:hover { color: white; border-color: white; }
+
+  nav.tabs { display: flex; background: var(--white); border-bottom: 1px solid var(--paper-line); position: sticky; top: 60px; z-index: 19; overflow-x: auto; }
+  .tab-btn { flex: 1; min-width: 90px; background: none; padding: 14px 8px; font-size: 13px; font-weight: 600; color: var(--ink-soft); border-bottom: 3px solid transparent; white-space: nowrap; }
+  .tab-btn.active { color: var(--navy); border-bottom-color: var(--gold); }
+
+  main { max-width: 640px; margin: 0 auto; padding: 20px 16px 60px; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .card { background: var(--white); border: 1px solid var(--paper-line); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
+  .biodata-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--paper-line); font-size: 14px; }
+  .biodata-row:last-child { border-bottom: none; }
+  .biodata-label { color: var(--ink-soft); }
+  .biodata-value { font-weight: 600; text-align: right; }
+
+  .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); font-weight: 600; margin: 20px 0 10px; }
+
+  .tagihan-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--paper-line); }
+  .tagihan-row:last-child { border-bottom: none; }
+  .tagihan-bulan { font-weight: 600; font-size: 14px; }
+  .tagihan-nominal { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .badge { font-size: 10.5px; font-weight: 600; padding: 4px 9px; border-radius: 20px; white-space: nowrap; }
+  .badge-lunas { background: var(--green-soft); color: var(--green); }
+  .badge-belum { background: var(--red-soft); color: var(--red); }
+  .link-bayar { display: inline-block; margin-top: 6px; font-size: 12.5px; color: var(--navy); font-weight: 600; }
+
+  .absen-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--paper-line); font-size: 13.5px; }
+  .absen-row:last-child { border-bottom: none; }
+  .absen-tanggal { color: var(--ink-soft); }
+  .badge-hadir { background: var(--green-soft); color: var(--green); }
+  .badge-telat { background: #FBF0DC; color: #97701E; }
+
+  .empty-state { text-align: center; padding: 30px 20px; color: var(--ink-soft); font-size: 13.5px; }
+  .must-reset-banner { background: var(--red-soft); color: var(--red); padding: 12px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-eyebrow">Agentix AI &middot; Portal Sekolah</div>
+    <h1 class="login-title display">Masuk Portal</h1>
+    <p class="login-sub">Untuk siswa dan wali murid. Masuk pakai Nomor Induk Siswa (NIS) dan password.</p>
+    <div class="alert-box alert-error" id="login-error"></div>
+    <label for="nis-input">Nomor Induk Siswa</label>
+    <input type="text" id="nis-input" placeholder="Contoh: SIS001" autocomplete="off">
+    <label for="pw-input">Password</label>
+    <input type="password" id="pw-input" placeholder="Password">
+    <div class="login-hint">Belum pernah login? Password awal kamu adalah NIS kamu sendiri.</div>
+    <button class="btn-primary" id="login-btn">Masuk</button>
+  </div>
+</div>
+
+<div id="app-screen">
+  <header class="topbar">
+    <div class="topbar-title" style="flex-direction: row; align-items: center; gap: 10px;">
+      <img id="topbar-logo" src="" alt="" style="display:none; width:32px; height:32px; border-radius:6px; object-fit:cover;">
+      <div class="topbar-title">
+        <span class="topbar-eyebrow">Portal siswa</span>
+        <span class="topbar-nama" id="nama-siswa-label">&mdash;</span>
+      </div>
+    </div>
+    <button class="btn-logout" id="logout-btn">Keluar</button>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-view="biodata-view">Biodata</button>
+    <button class="tab-btn" data-view="tagihan-view">Tagihan</button>
+    <button class="tab-btn" data-view="absen-view">Absensi</button>
+    <button class="tab-btn" data-view="password-view">Ganti Password</button>
+  </nav>
+
+  <main>
+    <div id="must-reset-banner" class="must-reset-banner" style="display:none">
+      Ini login pertama kamu. Demi keamanan, segera ganti password lewat tab "Ganti Password".
+    </div>
+
+    <div class="view active" id="biodata-view">
+      <div class="section-label">Biodata Siswa</div>
+      <div class="card" id="biodata-card"></div>
+    </div>
+
+    <div class="view" id="tagihan-view">
+      <div class="section-label">Riwayat Tagihan SPP</div>
+      <div class="card" id="tagihan-card"></div>
+    </div>
+
+    <div class="view" id="absen-view">
+      <div class="section-label">Riwayat Absensi (14 Hari Terakhir)</div>
+      <div class="card" id="absen-card"></div>
+    </div>
+
+    <div class="view" id="password-view">
+      <div class="section-label">Ganti Password</div>
+      <div class="card">
+        <div class="alert-box alert-error" id="pw-error"></div>
+        <div class="alert-box alert-success" id="pw-success"></div>
+        <label for="pw-lama-input">Password Lama</label>
+        <input type="password" id="pw-lama-input">
+        <label for="pw-baru-input">Password Baru (min. 4 karakter)</label>
+        <input type="password" id="pw-baru-input">
+        <button class="btn-primary" id="ganti-pw-btn">Simpan Password Baru</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const API_BASE = 'https://n8n-d59325.app3.flaz.my.id/webhook';
+let state = { siswaId: '', biodata: {}, tagihan: [], riwayatAbsensi: [] };
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+function shadeColor(hex, percent) {
+  try {
+    let r = parseInt(hex.slice(1, 3), 16);
+    let g = parseInt(hex.slice(3, 5), 16);
+    let b = parseInt(hex.slice(5, 7), 16);
+    r = Math.max(0, Math.min(255, Math.floor(r * (1 + percent / 100))));
+    g = Math.max(0, Math.min(255, Math.floor(g * (1 + percent / 100))));
+    b = Math.max(0, Math.min(255, Math.floor(b * (1 + percent / 100))));
+    return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+  } catch (e) {
+    return hex;
+  }
+}
+
+function applyBranding(namaSekolah, logoUrl, warnaTema) {
+  const isValidHex = /^#[0-9A-Fa-f]{6}$/.test(warnaTema || '');
+  const primary = isValidHex ? warnaTema : '#1B3A5C';
+  const deep = isValidHex ? shadeColor(primary, -30) : '#12283F';
+
+  document.documentElement.style.setProperty('--navy', primary);
+  document.documentElement.style.setProperty('--navy-deep', deep);
+  document.getElementById('theme-color-meta').setAttribute('content', primary);
+
+  const topbarLogo = document.getElementById('topbar-logo');
+  if (logoUrl) {
+    topbarLogo.src = logoUrl;
+    topbarLogo.style.display = 'block';
+    document.getElementById('apple-icon-link').setAttribute('href', logoUrl);
+  }
+
+  const manifest = {
+    name: namaSekolah ? `Portal - ${namaSekolah}` : 'Agentix AI - Portal Siswa',
+    short_name: namaSekolah || 'Portal Siswa',
+    start_url: './portal-siswa-app.html',
+    display: 'standalone',
+    background_color: '#F6F3EC',
+    theme_color: primary,
+    icons: [
+      { src: logoUrl || 'https://api.iconify.design/mdi/account-school.svg?color=%231B3A5C&width=192&height=192', sizes: '192x192', type: logoUrl ? 'image/png' : 'image/svg+xml' },
+      { src: logoUrl || 'https://api.iconify.design/mdi/account-school.svg?color=%231B3A5C&width=512&height=512', sizes: '512x512', type: logoUrl ? 'image/png' : 'image/svg+xml' }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  document.getElementById('manifest-link').setAttribute('href', URL.createObjectURL(blob));
+}
+
+document.getElementById('login-btn').addEventListener('click', doLogin);
+document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+async function doLogin() {
+  const nis = document.getElementById('nis-input').value.trim();
+  const pw = document.getElementById('pw-input').value;
+  const errorBox = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  errorBox.style.display = 'none';
+
+  if (!nis || !pw) {
+    errorBox.textContent = 'Isi NIS dan password dulu.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Memeriksa...';
+
+  try {
+    const res = await fetch(`${API_BASE}/portal-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ siswa_id: nis, password: pw })
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      errorBox.textContent = data.message || 'Login gagal.';
+      errorBox.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Masuk';
+      return;
+    }
+
+    state.siswaId = nis;
+    state.biodata = data.biodata;
+    state.tagihan = data.tagihan || [];
+    state.riwayatAbsensi = data.riwayat_absensi || [];
+
+    const sekolah = data.sekolah || {};
+    applyBranding(sekolah.nama_sekolah, sekolah.logo_url, sekolah.warna_tema);
+
+    document.getElementById('nama-siswa-label').textContent = state.biodata.nama_siswa;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    document.getElementById('must-reset-banner').style.display = data.must_reset_password ? 'block' : 'none';
+
+    renderBiodata();
+    renderTagihan();
+    renderAbsensi();
+  } catch (err) {
+    errorBox.textContent = 'Gagal menghubungi server. Coba lagi.';
+    errorBox.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Masuk';
+}
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  state = { siswaId: '', biodata: {}, tagihan: [], riwayatAbsensi: [] };
+  document.getElementById('nis-input').value = '';
+  document.getElementById('pw-input').value = '';
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+});
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.view).classList.add('active');
+  });
+});
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+function renderBiodata() {
+  const b = state.biodata;
+  document.getElementById('biodata-card').innerHTML = `
+    <div class="biodata-row"><span class="biodata-label">Nomor Induk</span><span class="biodata-value">${escapeHtml(b.siswa_id)}</span></div>
+    <div class="biodata-row"><span class="biodata-label">Nama</span><span class="biodata-value">${escapeHtml(b.nama_siswa)}</span></div>
+    <div class="biodata-row"><span class="biodata-label">Kelas</span><span class="biodata-value">${escapeHtml(b.kelas)}</span></div>
+    <div class="biodata-row"><span class="biodata-label">No. WA Wali</span><span class="biodata-value">${escapeHtml(b.no_wa_ortu)}</span></div>
+    <div class="biodata-row"><span class="biodata-label">SPP per Bulan</span><span class="biodata-value mono">Rp${Number(b.nominal_spp || 0).toLocaleString('id-ID')}</span></div>
+  `;
+}
+
+function renderTagihan() {
+  const container = document.getElementById('tagihan-card');
+  if (!state.tagihan.length) {
+    container.innerHTML = '<div class="empty-state">Belum ada tagihan tercatat.</div>';
+    return;
+  }
+  const sorted = [...state.tagihan].sort((a, b) => (a.bulan < b.bulan ? 1 : -1));
+  container.innerHTML = sorted.map(t => `
+    <div class="tagihan-row">
+      <div>
+        <div class="tagihan-bulan">${escapeHtml(t.bulan)}</div>
+        <div class="tagihan-nominal mono">Rp${Number(t.nominal || 0).toLocaleString('id-ID')}</div>
+        ${t.status !== 'lunas' && t.midtrans_snap_url ? `<a class="link-bayar" href="${escapeHtml(t.midtrans_snap_url)}" target="_blank" rel="noopener">Bayar sekarang &rarr;</a>` : ''}
+      </div>
+      <span class="badge ${t.status === 'lunas' ? 'badge-lunas' : 'badge-belum'}">${t.status === 'lunas' ? 'Lunas' : 'Belum bayar'}</span>
+    </div>
+  `).join('');
+}
+
+function renderAbsensi() {
+  const container = document.getElementById('absen-card');
+  if (!state.riwayatAbsensi.length) {
+    container.innerHTML = '<div class="empty-state">Belum ada riwayat absensi.</div>';
+    return;
+  }
+  container.innerHTML = state.riwayatAbsensi.map(a => `
+    <div class="absen-row">
+      <span class="absen-tanggal">${escapeHtml(a.tanggal)}</span>
+      <span class="badge ${a.status === 'telat' ? 'badge-telat' : 'badge-hadir'}">${a.status === 'telat' ? 'Telat' : 'Hadir'} ${escapeHtml(a.jam_masuk)}</span>
+    </div>
+  `).join('');
+}
+
+document.getElementById('ganti-pw-btn').addEventListener('click', async () => {
+  const pwLama = document.getElementById('pw-lama-input').value;
+  const pwBaru = document.getElementById('pw-baru-input').value;
+  const errorBox = document.getElementById('pw-error');
+  const successBox = document.getElementById('pw-success');
+  const btn = document.getElementById('ganti-pw-btn');
+  errorBox.style.display = 'none';
+  successBox.style.display = 'none';
+
+  if (!pwLama || !pwBaru) {
+    errorBox.textContent = 'Isi password lama dan baru dulu.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Menyimpan...';
+
+  try {
+    const res = await fetch(`${API_BASE}/portal-ganti-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ siswa_id: state.siswaId, password_lama: pwLama, password_baru: pwBaru })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      successBox.textContent = data.message;
+      successBox.style.display = 'block';
+      document.getElementById('pw-lama-input').value = '';
+      document.getElementById('pw-baru-input').value = '';
+      document.getElementById('must-reset-banner').style.display = 'none';
+    } else {
+      errorBox.textContent = data.message || 'Gagal mengganti password.';
+      errorBox.style.display = 'block';
+    }
+  } catch (err) {
+    errorBox.textContent = 'Gagal menghubungi server. Coba lagi.';
+    errorBox.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Simpan Password Baru';
+});
+</script>
+
+</body>
+</html>

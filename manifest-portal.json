@@ -1,0 +1,20 @@
+{
+  "name": "Agentix AI - Portal Siswa",
+  "short_name": "Portal Siswa",
+  "start_url": "./portal-siswa-app.html",
+  "display": "standalone",
+  "background_color": "#F6F3EC",
+  "theme_color": "#1B3A5C",
+  "icons": [
+    {
+      "src": "https://api.iconify.design/mdi/account-school.svg?color=%231B3A5C&width=192&height=192",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "https://api.iconify.design/mdi/account-school.svg?color=%231B3A5C&width=512&height=512",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

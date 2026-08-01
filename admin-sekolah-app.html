@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Buku Administrasi Sekolah</title>
+<link rel="manifest" id="manifest-link" href="./manifest-admin.json">
+<meta name="theme-color" id="theme-color-meta" content="#1B3A5C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Admin Sekolah">
+<link rel="apple-touch-icon" id="apple-icon-link" href="https://api.iconify.design/mdi/school.svg?color=%231B3A5C&width=192&height=192">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1B3A5C;
+    --navy-deep: #12283F;
+    --paper: #F6F3EC;
+    --paper-line: #E4DFD1;
+    --ink: #21262B;
+    --ink-soft: #5B6570;
+    --gold: #C9973B;
+    --green: #2F7D5B;
+    --green-soft: #E4F1EA;
+    --red: #C0502D;
+    --red-soft: #F7E7DF;
+    --white: #FFFFFF;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+  }
+  .display { font-family: 'Fraunces', serif; }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  /* ===== LOGIN ===== */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background:
+      linear-gradient(var(--navy-deep), var(--navy-deep)),
+      repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(255,255,255,0.035) 28px);
+  }
+  .login-card {
+    background: var(--paper);
+    border-radius: var(--radius);
+    max-width: 380px;
+    width: 100%;
+    padding: 36px 32px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+    position: relative;
+    overflow: hidden;
+  }
+  .login-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--gold), var(--navy));
+  }
+  .login-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .login-title {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--navy-deep);
+    margin: 0 0 4px;
+  }
+  .login-sub {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin: 0 0 26px;
+    line-height: 1.5;
+  }
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  input[type=text], input[type=password] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--paper-line);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    background: var(--white);
+    color: var(--ink);
+    margin-bottom: 18px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type=text]:focus, input[type=password]:focus {
+    border-color: var(--navy);
+  }
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary {
+    width: 100%;
+    background: var(--navy);
+    color: var(--white);
+    padding: 13px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: var(--navy-deep); }
+  .btn-primary:disabled { opacity: 0.5; cursor: default; }
+  .login-error {
+    background: var(--red-soft);
+    color: var(--red);
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  /* ===== APP SHELL ===== */
+  #app-screen { display: none; min-height: 100vh; }
+  header.topbar {
+    background: var(--navy-deep);
+    color: var(--white);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .topbar-title { display: flex; flex-direction: column; }
+  .topbar-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+  }
+  .topbar-school { font-size: 16px; font-weight: 600; font-family: 'Fraunces', serif; }
+  .btn-logout {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+  .btn-logout:hover { color: white; border-color: white; }
+
+  nav.tabs {
+    display: flex;
+    background: var(--white);
+    border-bottom: 1px solid var(--paper-line);
+    position: sticky;
+    top: 60px;
+    z-index: 19;
+  }
+  .tab-btn {
+    flex: 1;
+    background: none;
+    padding: 14px 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    border-bottom: 3px solid transparent;
+  }
+  .tab-btn.active { color: var(--navy); border-bottom-color: var(--gold); }
+
+  main { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ===== DASHBOARD ===== */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .summary-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 16px;
+    border: 1px solid var(--paper-line);
+  }
+  .summary-num {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--navy-deep);
+  }
+  .summary-label {
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    font-weight: 500;
+  }
+  .summary-card.accent-green .summary-num { color: var(--green); }
+  .summary-card.accent-red .summary-num { color: var(--red); }
+
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin: 24px 0 10px;
+  }
+
+  input#search-box {
+    margin-bottom: 12px;
+  }
+
+  .siswa-row {
+    background: var(--white);
+    border: 1px solid var(--paper-line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .siswa-info { min-width: 0; }
+  .siswa-nama { font-weight: 600; font-size: 14.5px; color: var(--ink); }
+  .siswa-kelas { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .badges { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+  .badge {
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .badge-lunas { background: var(--green-soft); color: var(--green); }
+  .badge-belum { background: var(--red-soft); color: var(--red); }
+  .badge-belum-ditagih { background: #EEEEEE; color: var(--ink-soft); }
+  .badge-hadir { background: var(--green-soft); color: var(--green); }
+  .badge-telat { background: #FBF0DC; color: #97701E; }
+  .badge-absen { background: #EEEEEE; color: var(--ink-soft); }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ink-soft);
+    font-size: 13.5px;
+  }
+
+  /* ===== SCAN ===== */
+  .scan-wrap { text-align: center; }
+  .rfid-frame {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    aspect-ratio: 1.3/1;
+    margin: 10px auto 20px;
+    border-radius: 16px;
+    background: var(--navy-deep);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 3px dashed rgba(201,151,59,0.5);
+  }
+  .rfid-icon { font-size: 40px; }
+  .rfid-instruction { color: rgba(255,255,255,0.75); font-size: 13.5px; font-weight: 500; }
+  .rfid-hidden-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 1px; height: 1px;
+  }
+  select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--paper-line);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    background: var(--white);
+    color: var(--ink);
+    margin-bottom: 18px;
+  }
+  .scan-status {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    min-height: 20px;
+    margin-bottom: 18px;
+  }
+  .scan-result {
+    background: var(--white);
+    border: 1px solid var(--paper-line);
+    border-radius: var(--radius);
+    padding: 20px;
+    max-width: 340px;
+    margin: 0 auto;
+    display: none;
+  }
+  .scan-result.show { display: block; }
+  .scan-result-icon { font-size: 34px; margin-bottom: 8px; }
+  .scan-result-nama { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; }
+  .scan-result-detail { font-size: 13.5px; color: var(--ink-soft); margin-top: 4px; }
+  .btn-secondary {
+    background: var(--navy);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-top: 16px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-eyebrow">Agentix AI &middot; SPP &amp; Absensi</div>
+    <h1 class="login-title display">Buku Administrasi</h1>
+    <p class="login-sub">Masuk pakai kode sekolah dan kode akses admin yang diberikan Agentix AI.</p>
+    <div class="login-error" id="login-error"></div>
+    <label for="school-id-input">Kode Sekolah</label>
+    <input type="text" id="school-id-input" placeholder="Contoh: SKL001" autocomplete="off">
+    <label for="access-code-input">Kode Akses Admin</label>
+    <input type="password" id="access-code-input" placeholder="Kode akses">
+    <button class="btn-primary" id="login-btn">Masuk</button>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app-screen">
+  <header class="topbar">
+    <div class="topbar-title" style="flex-direction: row; align-items: center; gap: 10px;">
+      <img id="topbar-logo" src="" alt="" style="display:none; width:32px; height:32px; border-radius:6px; object-fit:cover;">
+      <div class="topbar-title">
+        <span class="topbar-eyebrow">Admin sekolah</span>
+        <span class="topbar-school" id="nama-sekolah-label">&mdash;</span>
+      </div>
+    </div>
+    <button class="btn-logout" id="logout-btn">Keluar</button>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-view="dashboard-view">Dashboard</button>
+    <button class="tab-btn" data-view="scan-view">Absen (RFID)</button>
+    <button class="tab-btn" data-view="daftar-kartu-view">Daftarkan Kartu</button>
+  </nav>
+
+  <main>
+    <!-- DASHBOARD -->
+    <div class="view active" id="dashboard-view">
+      <div class="summary-grid" id="summary-grid"></div>
+
+      <div class="section-label">Daftar Siswa</div>
+      <input type="text" id="search-box" placeholder="Cari nama atau kelas...">
+      <div id="siswa-list"></div>
+    </div>
+
+    <!-- SCAN RFID -->
+    <div class="view" id="scan-view">
+      <div class="scan-wrap">
+        <div class="section-label" style="text-align:left">Absen Masuk - Tap Kartu RFID</div>
+        <div class="rfid-frame">
+          <div class="rfid-icon">📶</div>
+          <div class="rfid-instruction">Tempelkan kartu ke reader</div>
+          <input type="text" id="rfid-input" class="rfid-hidden-input" autocomplete="off" autofocus>
+        </div>
+        <div class="scan-status" id="scan-status">Siap menerima kartu...</div>
+
+        <div class="scan-result" id="scan-result">
+          <div class="scan-result-icon" id="scan-result-icon"></div>
+          <div class="scan-result-nama" id="scan-result-nama"></div>
+          <div class="scan-result-detail" id="scan-result-detail"></div>
+          <button class="btn-secondary" id="scan-again-btn">Siap Kartu Berikutnya</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAFTARKAN KARTU -->
+    <div class="view" id="daftar-kartu-view">
+      <div class="section-label">Daftarkan Kartu RFID Ke Siswa</div>
+      <div class="card">
+        <div class="alert-box alert-error" id="daftar-error"></div>
+        <div class="alert-box alert-success" id="daftar-success"></div>
+        <label for="pilih-siswa-select">Pilih Siswa</label>
+        <select id="pilih-siswa-select"></select>
+        <label for="rfid-daftar-input">Tap Kartu di Sini</label>
+        <input type="text" id="rfid-daftar-input" placeholder="Tempelkan kartu ke reader..." autocomplete="off">
+        <button class="btn-primary" id="daftar-kartu-btn">Simpan Kartu Ini</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const API_BASE = 'https://n8n-d59325.app3.flaz.my.id/webhook';
+
+let state = {
+  schoolId: '',
+  accessCode: '',
+  namaSekolah: '',
+  siswa: []
+};
+
+// ===== PWA: service worker + branding dinamis per sekolah =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+function shadeColor(hex, percent) {
+  try {
+    let r = parseInt(hex.slice(1, 3), 16);
+    let g = parseInt(hex.slice(3, 5), 16);
+    let b = parseInt(hex.slice(5, 7), 16);
+    r = Math.max(0, Math.min(255, Math.floor(r * (1 + percent / 100))));
+    g = Math.max(0, Math.min(255, Math.floor(g * (1 + percent / 100))));
+    b = Math.max(0, Math.min(255, Math.floor(b * (1 + percent / 100))));
+    return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+  } catch (e) {
+    return hex;
+  }
+}
+
+function applyBranding(namaSekolah, logoUrl, warnaTema) {
+  const isValidHex = /^#[0-9A-Fa-f]{6}$/.test(warnaTema || '');
+  const primary = isValidHex ? warnaTema : '#1B3A5C';
+  const deep = isValidHex ? shadeColor(primary, -30) : '#12283F';
+
+  document.documentElement.style.setProperty('--navy', primary);
+  document.documentElement.style.setProperty('--navy-deep', deep);
+  document.getElementById('theme-color-meta').setAttribute('content', primary);
+
+  const topbarLogo = document.getElementById('topbar-logo');
+  if (logoUrl) {
+    topbarLogo.src = logoUrl;
+    topbarLogo.style.display = 'block';
+    document.getElementById('apple-icon-link').setAttribute('href', logoUrl);
+  }
+
+  // Manifest dinamis: begitu di-install ("Add to Home Screen"), ikon & nama yang dipakai
+  // adalah milik sekolah ini, bukan generic Agentix AI.
+  const manifest = {
+    name: namaSekolah ? `Admin - ${namaSekolah}` : 'Agentix AI - Admin Sekolah',
+    short_name: namaSekolah || 'Admin Sekolah',
+    start_url: './admin-sekolah-app.html',
+    display: 'standalone',
+    background_color: '#F6F3EC',
+    theme_color: primary,
+    icons: [
+      { src: logoUrl || 'https://api.iconify.design/mdi/school.svg?color=%231B3A5C&width=192&height=192', sizes: '192x192', type: logoUrl ? 'image/png' : 'image/svg+xml' },
+      { src: logoUrl || 'https://api.iconify.design/mdi/school.svg?color=%231B3A5C&width=512&height=512', sizes: '512x512', type: logoUrl ? 'image/png' : 'image/svg+xml' }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  document.getElementById('manifest-link').setAttribute('href', URL.createObjectURL(blob));
+}
+
+// ===== LOGIN =====
+document.getElementById('login-btn').addEventListener('click', doLogin);
+document.getElementById('access-code-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+async function doLogin() {
+  const schoolId = document.getElementById('school-id-input').value.trim();
+  const accessCode = document.getElementById('access-code-input').value.trim();
+  const errorBox = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  errorBox.style.display = 'none';
+
+  if (!schoolId || !accessCode) {
+    errorBox.textContent = 'Isi kode sekolah dan kode akses dulu.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Memeriksa...';
+
+  try {
+    const res = await fetch(`${API_BASE}/spp-data-admin?school_id=${encodeURIComponent(schoolId)}&kode_akses=${encodeURIComponent(accessCode)}`);
+    const data = await res.json();
+
+    if (!data.success) {
+      errorBox.textContent = data.message || 'Kode akses salah.';
+      errorBox.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Masuk';
+      return;
+    }
+
+    state.schoolId = schoolId;
+    state.accessCode = accessCode;
+    state.namaSekolah = data.nama_sekolah;
+    state.siswa = data.siswa || [];
+
+    applyBranding(data.nama_sekolah, data.logo_url, data.warna_tema);
+
+    document.getElementById('nama-sekolah-label').textContent = state.namaSekolah;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+
+    renderSummary(data.summary || {});
+    renderSiswaList(state.siswa);
+    populateSiswaSelect();
+  } catch (err) {
+    errorBox.textContent = 'Gagal menghubungi server. Coba lagi.';
+    errorBox.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Masuk';
+}
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  stopScanner();
+  state = { schoolId: '', accessCode: '', namaSekolah: '', siswa: [] };
+  document.getElementById('school-id-input').value = '';
+  document.getElementById('access-code-input').value = '';
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+});
+
+// ===== TABS =====
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.view).classList.add('active');
+
+    if (btn.dataset.view === 'scan-view') {
+      startScanner();
+    } else {
+      stopScanner();
+    }
+  });
+});
+
+// ===== DASHBOARD RENDER =====
+function renderSummary(s) {
+  const cards = [
+    { num: s.total_siswa || 0, label: 'Total Siswa', accent: '' },
+    { num: s.total_lunas || 0, label: 'SPP Lunas Bulan Ini', accent: 'accent-green' },
+    { num: s.total_belum_bayar || 0, label: 'Belum Bayar', accent: 'accent-red' },
+    { num: s.total_absen_hari_ini || 0, label: 'Hadir Hari Ini', accent: 'accent-green' }
+  ];
+  document.getElementById('summary-grid').innerHTML = cards.map(c => `
+    <div class="summary-card ${c.accent}">
+      <div class="summary-num mono">${c.num}</div>
+      <div class="summary-label">${c.label}</div>
+    </div>
+  `).join('');
+}
+
+function statusSppBadge(status) {
+  if (status === 'lunas') return '<span class="badge badge-lunas">Lunas</span>';
+  if (status === 'belum_ditagih') return '<span class="badge badge-belum-ditagih">Belum ditagih</span>';
+  return '<span class="badge badge-belum">Belum bayar</span>';
+}
+
+function absenBadge(absen) {
+  if (!absen) return '<span class="badge badge-absen">Belum absen</span>';
+  if (absen.status === 'telat') return `<span class="badge badge-telat">Telat ${absen.jam_masuk}</span>`;
+  return `<span class="badge badge-hadir">Hadir ${absen.jam_masuk}</span>`;
+}
+
+function renderSiswaList(list) {
+  const container = document.getElementById('siswa-list');
+  if (!list.length) {
+    container.innerHTML = '<div class="empty-state">Belum ada data siswa. Tambahkan lewat Google Sheets, akan tersinkron otomatis.</div>';
+    return;
+  }
+  container.innerHTML = list.map(s => `
+    <div class="siswa-row">
+      <div class="siswa-info">
+        <div class="siswa-nama">${escapeHtml(s.nama_siswa)}</div>
+        <div class="siswa-kelas">Kelas ${escapeHtml(s.kelas || '-')}</div>
+      </div>
+      <div class="badges">
+        ${statusSppBadge(s.status_spp)}
+        ${absenBadge(s.absen_hari_ini)}
+      </div>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+document.getElementById('search-box').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase();
+  const filtered = state.siswa.filter(s =>
+    (s.nama_siswa || '').toLowerCase().includes(q) ||
+    (s.kelas || '').toLowerCase().includes(q)
+  );
+  renderSiswaList(filtered);
+});
+
+// ===== RFID SCANNER =====
+// RFID reader USB berfungsi sebagai keyboard: pas kartu ditap, dia "mengetik"
+// ID kartu ke input yang sedang fokus, lalu otomatis menekan Enter.
+let scanBusy = false;
+
+function startScanner() {
+  const statusEl = document.getElementById('scan-status');
+  const input = document.getElementById('rfid-input');
+  document.getElementById('scan-result').classList.remove('show');
+  statusEl.textContent = 'Siap menerima kartu...';
+  input.value = '';
+  input.focus();
+}
+
+function stopScanner() {
+  // tidak ada resource yang perlu dilepas untuk RFID (beda dari kamera)
+}
+
+document.getElementById('rfid-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const rfidUid = e.target.value.trim();
+    e.target.value = '';
+    if (rfidUid) handleScanResult(rfidUid);
+  }
+});
+
+// Jaga input tetap fokus kalau area scan lagi aktif dan user gak sedang isi form lain
+document.addEventListener('click', () => {
+  const scanView = document.getElementById('scan-view');
+  if (scanView.classList.contains('active')) {
+    document.getElementById('rfid-input').focus();
+  }
+});
+
+async function handleScanResult(rfidUid) {
+  if (scanBusy) return;
+  scanBusy = true;
+  document.getElementById('scan-status').textContent = 'Memproses...';
+
+  try {
+    const res = await fetch(`${API_BASE}/absensi-scan-in`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rfid_uid: rfidUid, school_id: state.schoolId })
+    });
+    const data = await res.json();
+    showScanResult(data);
+  } catch (err) {
+    showScanResult({ status: 'error', message: 'Gagal mengirim data. Cek koneksi internet.' });
+  }
+}
+
+function showScanResult(data) {
+  const resultBox = document.getElementById('scan-result');
+  const icon = document.getElementById('scan-result-icon');
+  const nama = document.getElementById('scan-result-nama');
+  const detail = document.getElementById('scan-result-detail');
+
+  if (data.status === 'ok') {
+    icon.textContent = data.status_kehadiran === 'telat' ? '⏰' : '✅';
+    nama.textContent = data.nama_siswa;
+    detail.textContent = `Absen ${data.status_kehadiran} jam ${data.jam_masuk}`;
+  } else if (data.status === 'duplicate') {
+    icon.textContent = 'ℹ️';
+    nama.textContent = 'Sudah absen';
+    detail.textContent = data.message;
+  } else if (data.status === 'unregistered') {
+    icon.textContent = '❓';
+    nama.textContent = 'Kartu belum terdaftar';
+    detail.textContent = data.message;
+  } else {
+    icon.textContent = '⚠️';
+    nama.textContent = 'Gagal mencatat absen';
+    detail.textContent = data.message || 'Terjadi kesalahan.';
+  }
+
+  document.getElementById('scan-status').textContent = '';
+  resultBox.classList.add('show');
+}
+
+document.getElementById('scan-again-btn').addEventListener('click', () => {
+  document.getElementById('scan-result').classList.remove('show');
+  document.getElementById('scan-status').textContent = 'Siap menerima kartu...';
+  scanBusy = false;
+  document.getElementById('rfid-input').focus();
+});
+
+// ===== DAFTARKAN KARTU =====
+function populateSiswaSelect() {
+  const select = document.getElementById('pilih-siswa-select');
+  if (!state.siswa.length) {
+    select.innerHTML = '<option value="">Belum ada data siswa</option>';
+    return;
+  }
+  select.innerHTML = state.siswa.map(s =>
+    `<option value="${escapeHtml(s.siswa_id)}">${escapeHtml(s.nama_siswa)} - Kelas ${escapeHtml(s.kelas || '-')}</option>`
+  ).join('');
+}
+
+document.getElementById('daftar-kartu-btn').addEventListener('click', async () => {
+  const siswaId = document.getElementById('pilih-siswa-select').value;
+  const rfidUid = document.getElementById('rfid-daftar-input').value.trim();
+  const errorBox = document.getElementById('daftar-error');
+  const successBox = document.getElementById('daftar-success');
+  const btn = document.getElementById('daftar-kartu-btn');
+  errorBox.style.display = 'none';
+  successBox.style.display = 'none';
+
+  if (!siswaId || !rfidUid) {
+    errorBox.textContent = 'Pilih siswa dan tap kartu dulu.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Menyimpan...';
+
+  try {
+    const res = await fetch(`${API_BASE}/absensi-daftar-kartu`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ siswa_id: siswaId, school_id: state.schoolId, rfid_uid: rfidUid })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      successBox.textContent = data.message;
+      successBox.style.display = 'block';
+      document.getElementById('rfid-daftar-input').value = '';
+    } else {
+      errorBox.textContent = data.message || 'Gagal mendaftarkan kartu.';
+      errorBox.style.display = 'block';
+    }
+  } catch (err) {
+    errorBox.textContent = 'Gagal menghubungi server. Coba lagi.';
+    errorBox.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Simpan Kartu Ini';
+});
+</script>
+
+</body>
+</html>
