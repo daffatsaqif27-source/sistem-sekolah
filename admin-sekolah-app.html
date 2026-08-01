@@ -510,7 +510,11 @@ async function doLogin() {
   btn.textContent = 'Memeriksa...';
 
   try {
-    const res = await fetch(`${API_BASE}/spp-data-admin?school_id=${encodeURIComponent(schoolId)}&kode_akses=${encodeURIComponent(accessCode)}`);
+    const res = await fetch(`${API_BASE}/spp-data-admin-v2`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ school_id: schoolId, kode_akses: accessCode })
+    });
     const data = await res.json();
 
     if (!data.success) {
