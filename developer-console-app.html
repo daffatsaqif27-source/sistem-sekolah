@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Developer Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #4C2A85;
+    --navy-deep: #2E1857;
+    --paper: #F6F3EC;
+    --paper-line: #E4DFD1;
+    --ink: #21262B;
+    --ink-soft: #5B6570;
+    --gold: #C9973B;
+    --green: #2F7D5B;
+    --green-soft: #E4F1EA;
+    --red: #C0502D;
+    --red-soft: #F7E7DF;
+    --white: #FFFFFF;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'IBM Plex Sans', sans-serif; min-height: 100vh; }
+  .display { font-family: 'Fraunces', serif; }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+  @keyframes popIn { 0% { opacity: 0; transform: scale(0.6); } 70% { transform: scale(1.06); } 100% { opacity: 1; transform: scale(1); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #login-screen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+    background: linear-gradient(var(--navy-deep), #150c29), repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(255,255,255,0.035) 28px);
+  }
+  .login-card { background: var(--paper); border-radius: var(--radius); max-width: 380px; width: 100%; padding: 36px 32px; box-shadow: 0 24px 60px rgba(0,0,0,0.4); position: relative; overflow: hidden; animation: scaleIn 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+  .login-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--gold), var(--navy)); }
+  .login-eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 6px; }
+  .login-title { font-size: 24px; font-weight: 600; color: var(--navy-deep); margin: 0 0 4px; }
+  .login-sub { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 26px; line-height: 1.5; }
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-soft); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+  input[type=password] { width: 100%; padding: 12px 14px; border: 1.5px solid var(--paper-line); border-radius: 8px; font-size: 15px; font-family: inherit; background: var(--white); color: var(--ink); margin-bottom: 18px; outline: none; }
+  input:focus { border-color: var(--navy); }
+  button { font-family: inherit; cursor: pointer; border: none; }
+  .btn-primary { width: 100%; background: var(--navy); color: var(--white); padding: 13px; border-radius: 8px; font-size: 15px; font-weight: 600; transition: background 0.15s, transform 0.15s; }
+  .btn-primary:hover { background: var(--navy-deep); }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-primary:disabled { opacity: 0.5; cursor: default; }
+  .alert-error { background: var(--red-soft); color: var(--red); font-size: 13px; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; display: none; }
+
+  #app-screen { display: none; min-height: 100vh; }
+  header.topbar { background: var(--navy-deep); color: var(--white); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 20; }
+  .topbar-eyebrow { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); font-weight: 600; display: block; }
+  .topbar-title-text { font-size: 16px; font-weight: 600; font-family: 'Fraunces', serif; }
+  .btn-logout { background: transparent; color: rgba(255,255,255,0.7); font-size: 12px; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.25); }
+  .btn-logout:hover { color: white; border-color: white; }
+
+  nav.tabs { display: flex; background: var(--white); border-bottom: 1px solid var(--paper-line); position: sticky; top: 60px; z-index: 19; overflow-x: auto; }
+  .tab-btn { flex: 1; min-width: 100px; background: none; padding: 14px 8px; font-size: 13px; font-weight: 600; color: var(--ink-soft); border-bottom: 3px solid transparent; white-space: nowrap; transition: color 0.2s, border-color 0.2s; }
+  .tab-btn.active { color: var(--navy); border-bottom-color: var(--gold); }
+
+  main { max-width: 760px; margin: 0 auto; padding: 20px 16px 60px; }
+  .view { display: none; }
+  .view.active { display: block; animation: fadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 22px; }
+  .summary-card { background: var(--white); border-radius: var(--radius); padding: 16px; border: 1px solid var(--paper-line); animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; transition: transform 0.15s; }
+  .summary-card:hover { transform: translateY(-2px); }
+  .summary-num { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 600; line-height: 1; color: var(--navy-deep); }
+  .summary-label { font-size: 11.5px; color: var(--ink-soft); margin-top: 6px; font-weight: 500; }
+
+  .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); font-weight: 600; margin: 24px 0 10px; }
+
+  .sekolah-row, .log-row {
+    background: var(--white); border: 1px solid var(--paper-line); border-radius: 8px; padding: 12px 14px; margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .sekolah-nama { font-weight: 600; font-size: 14.5px; }
+  .sekolah-meta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .badge { font-size: 10.5px; font-weight: 600; padding: 4px 9px; border-radius: 20px; white-space: nowrap; animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  .badge-aktif { background: var(--green-soft); color: var(--green); }
+  .badge-nonaktif { background: var(--red-soft); color: var(--red); }
+
+  .log-detail { font-size: 13.5px; font-weight: 500; }
+  .log-meta { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+  .log-status { font-size: 10.5px; font-weight: 600; padding: 4px 9px; border-radius: 20px; white-space: nowrap; }
+  .log-status.ok { background: var(--green-soft); color: var(--green); }
+  .log-status.gagal { background: var(--red-soft); color: var(--red); }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--ink-soft); font-size: 13.5px; }
+
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-eyebrow">Agentix AI &middot; Master Access</div>
+    <h1 class="login-title display">Developer Console</h1>
+    <p class="login-sub">Akses penuh ke semua sekolah dan log aktivitas sistem. Hanya untuk developer.</p>
+    <div class="alert-error" id="login-error"></div>
+    <label for="kode-input">Kode Akses Developer</label>
+    <input type="password" id="kode-input" placeholder="Kode akses">
+    <button class="btn-primary" id="login-btn">Masuk</button>
+  </div>
+</div>
+
+<div id="app-screen">
+  <header class="topbar">
+    <div>
+      <span class="topbar-eyebrow">Master access</span>
+      <span class="topbar-title-text">Developer Console</span>
+    </div>
+    <button class="btn-logout" id="logout-btn">Keluar</button>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-view="overview-view">Ringkasan</button>
+    <button class="tab-btn" data-view="sekolah-view">Semua Sekolah</button>
+    <button class="tab-btn" data-view="log-view">Log Global</button>
+  </nav>
+
+  <main>
+    <div class="view active" id="overview-view">
+      <div class="section-label">Ringkasan Bisnis</div>
+      <div class="summary-grid" id="summary-grid"></div>
+    </div>
+
+    <div class="view" id="sekolah-view">
+      <div class="section-label">Semua Sekolah</div>
+      <div id="sekolah-list"></div>
+    </div>
+
+    <div class="view" id="log-view">
+      <div class="section-label">Log Aktivitas Seluruh Sistem (50 Terakhir)</div>
+      <div id="log-list"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+const API_BASE = 'https://n8n-d59325.app3.flaz.my.id/webhook';
+let state = {};
+
+document.getElementById('login-btn').addEventListener('click', doLogin);
+document.getElementById('kode-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+async function doLogin() {
+  const kode = document.getElementById('kode-input').value.trim();
+  const errorBox = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  errorBox.style.display = 'none';
+
+  if (!kode) {
+    errorBox.textContent = 'Isi kode akses dulu.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Memeriksa...';
+
+  try {
+    const res = await fetch(`${API_BASE}/dev-dashboard-data`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kode_akses: kode })
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      errorBox.textContent = data.message || 'Kode akses salah.';
+      errorBox.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Masuk';
+      return;
+    }
+
+    state = data;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+
+    renderSummary(data.summary || {});
+    renderSekolahList(data.sekolah_list || []);
+    renderLogGlobal(data.log_aktivitas || []);
+  } catch (err) {
+    errorBox.textContent = 'Gagal menghubungi server. Coba lagi.';
+    errorBox.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Masuk';
+}
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  state = {};
+  document.getElementById('kode-input').value = '';
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+});
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.view).classList.add('active');
+  });
+});
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+function renderSummary(s) {
+  const cards = [
+    { num: s.total_sekolah || 0, label: 'Total Sekolah' },
+    { num: s.total_sekolah_aktif || 0, label: 'Sekolah Aktif' },
+    { num: s.total_siswa || 0, label: 'Total Siswa (Semua Sekolah)' },
+    { num: 'Rp' + Number(s.total_nominal_terkumpul_bulan_ini || 0).toLocaleString('id-ID'), label: 'Terkumpul Bulan Ini' }
+  ];
+  document.getElementById('summary-grid').innerHTML = cards.map((c, i) => `
+    <div class="summary-card" style="animation-delay: ${i * 0.06}s">
+      <div class="summary-num mono">${c.num}</div>
+      <div class="summary-label">${c.label}</div>
+    </div>
+  `).join('');
+}
+
+function renderSekolahList(list) {
+  const container = document.getElementById('sekolah-list');
+  if (!list.length) {
+    container.innerHTML = '<div class="empty-state">Belum ada sekolah terdaftar.</div>';
+    return;
+  }
+  container.innerHTML = list.map((s, i) => `
+    <div class="sekolah-row" style="animation-delay: ${i * 0.05}s">
+      <div>
+        <div class="sekolah-nama">${escapeHtml(s.nama_sekolah)}</div>
+        <div class="sekolah-meta">${escapeHtml(s.school_id)} &middot; ${s.jumlah_siswa} siswa &middot; Rp${Number(s.nominal_terkumpul_bulan_ini || 0).toLocaleString('id-ID')} terkumpul bulan ini</div>
+      </div>
+      <span class="badge ${s.status_langganan === 'aktif' ? 'badge-aktif' : 'badge-nonaktif'}">${escapeHtml(s.status_langganan)}</span>
+    </div>
+  `).join('');
+}
+
+const JENIS_LABEL = {
+  login_admin: 'Login admin',
+  login_admin_gagal: 'Percobaan login admin gagal',
+  login_siswa: 'Login siswa/ortu',
+  login_siswa_gagal: 'Percobaan login siswa gagal',
+  reset_password: 'Reset password siswa',
+  reset_password_gagal: 'Percobaan reset password gagal',
+  login_developer: 'Login developer',
+  login_developer_gagal: 'Percobaan login developer gagal'
+};
+
+function renderLogGlobal(list) {
+  const container = document.getElementById('log-list');
+  if (!list.length) {
+    container.innerHTML = '<div class="empty-state">Belum ada log aktivitas.</div>';
+    return;
+  }
+  container.innerHTML = list.map((l, i) => {
+    const waktu = l.waktu ? new Date(l.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+    return `
+      <div class="log-row" style="animation-delay: ${Math.min(i * 0.02, 0.4)}s">
+        <div>
+          <div class="log-detail">${escapeHtml(JENIS_LABEL[l.jenis] || l.jenis)}</div>
+          <div class="log-meta">${escapeHtml(l.school_id)} &middot; ${escapeHtml(l.detail)} &middot; ${waktu}</div>
+        </div>
+        <span class="log-status ${l.berhasil ? 'ok' : 'gagal'}">${l.berhasil ? 'Berhasil' : 'Gagal'}</span>
+      </div>
+    `;
+  }).join('');
+}
+</script>
+
+</body>
+</html>
