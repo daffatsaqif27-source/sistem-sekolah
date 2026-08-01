@@ -428,6 +428,9 @@ function shadeColor(hex, percent) {
   } catch (e) { return hex; }
 }
 
+const SVG_LOGO_FALLBACK_PREVIEW = '<svg class="icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>';
+function handleLogoImgError(imgEl, fallbackHtml) { imgEl.parentElement.innerHTML = fallbackHtml; }
+
 function applyBranding(namaSekolah, logoUrl, warnaTema) {
   const isValidHex = /^#[0-9A-Fa-f]{6}$/.test(warnaTema || '');
   const primary = isValidHex ? warnaTema : '#4F46E5';
@@ -447,12 +450,11 @@ function applyBranding(namaSekolah, logoUrl, warnaTema) {
   }
 
   const preview = document.getElementById('logo-preview');
-  const previewFallback = '<svg class="icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>';
   if (preview) {
     if (logoUrl) {
-      preview.innerHTML = `<img src="${escapeHtml(logoUrl)}" onerror="this.parentElement.innerHTML='${previewFallback.replace(/'/g, "\\'")}'">`;
+      preview.innerHTML = `<img src="${escapeHtml(logoUrl)}" style="width:100%;height:100%;object-fit:contain" onerror="handleLogoImgError(this, SVG_LOGO_FALLBACK_PREVIEW)">`;
     } else {
-      preview.innerHTML = previewFallback;
+      preview.innerHTML = SVG_LOGO_FALLBACK_PREVIEW;
     }
   }
   const logoInput = document.getElementById('logo-url-input');
