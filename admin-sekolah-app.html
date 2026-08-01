@@ -263,6 +263,16 @@
   .badge-lunas { background: var(--green-soft); color: var(--green); }
   .badge-belum { background: var(--red-soft); color: var(--red); }
   .badge-belum-ditagih { background: #EEEEEE; color: var(--ink-soft); }
+  .btn-reset-pw {
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 20px;
+    background: var(--paper);
+    color: var(--ink-soft);
+    border: 1px solid var(--paper-line);
+  }
+  .btn-reset-pw:hover { background: var(--paper-line); }
   .badge-hadir { background: var(--green-soft); color: var(--green); }
   .badge-telat { background: #FBF0DC; color: #97701E; }
   .badge-absen { background: #EEEEEE; color: var(--ink-soft); }
@@ -273,6 +283,24 @@
     color: var(--ink-soft);
     font-size: 13.5px;
   }
+
+  .log-row {
+    background: var(--white);
+    border: 1px solid var(--paper-line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .log-detail { font-size: 13.5px; font-weight: 500; }
+  .log-waktu { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+  .log-status { font-size: 10.5px; font-weight: 600; padding: 4px 9px; border-radius: 20px; white-space: nowrap; }
+  .log-status.ok { background: var(--green-soft); color: var(--green); }
+  .log-status.gagal { background: var(--red-soft); color: var(--red); }
 
   /* ===== SCAN ===== */
   .scan-wrap { text-align: center; }
@@ -340,7 +368,67 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; }
+    * { transition: none !important; animation: none !important; }
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes popIn {
+    0% { opacity: 0; transform: scale(0.6); }
+    70% { transform: scale(1.06); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: 200px 0; }
+  }
+
+  .login-card { animation: scaleIn 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+  .view.active { animation: fadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+  .summary-card, .siswa-row, .tagihan-row, .absen-row, .card {
+    animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .badge { animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  .scan-result.show { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+  button, .tab-btn, .siswa-row, .summary-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .btn-primary:active, .btn-secondary:active, .btn-reset-pw:active { transform: scale(0.97); }
+  .summary-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(27,58,92,0.08); }
+  .siswa-row:hover { transform: translateX(2px); border-color: var(--gold); }
+  .tab-btn { transition: color 0.2s ease, border-color 0.2s ease; }
+
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--paper-line) 25%, #f0ece0 37%, var(--paper-line) 63%);
+    background-size: 400px 100%;
+    animation: shimmer 1.4s ease infinite;
+    border-radius: 6px;
   }
 </style>
 </head>
@@ -378,6 +466,7 @@
     <button class="tab-btn active" data-view="dashboard-view">Dashboard</button>
     <button class="tab-btn" data-view="scan-view">Absen (RFID)</button>
     <button class="tab-btn" data-view="daftar-kartu-view">Daftarkan Kartu</button>
+    <button class="tab-btn" data-view="log-view">Riwayat</button>
   </nav>
 
   <main>
@@ -422,6 +511,12 @@
         <input type="text" id="rfid-daftar-input" placeholder="Tempelkan kartu ke reader..." autocomplete="off">
         <button class="btn-primary" id="daftar-kartu-btn">Simpan Kartu Ini</button>
       </div>
+    </div>
+
+    <!-- RIWAYAT AKTIVITAS -->
+    <div class="view" id="log-view">
+      <div class="section-label">Riwayat Aktivitas Sistem</div>
+      <div id="log-aktivitas-list"></div>
     </div>
   </main>
 </div>
@@ -507,7 +602,7 @@ async function doLogin() {
   }
 
   btn.disabled = true;
-  btn.textContent = 'Memeriksa...';
+  btn.innerHTML = '<span class="spinner"></span>Memeriksa...';
 
   try {
     const res = await fetch(`${API_BASE}/spp-data-admin-v2`, {
@@ -539,6 +634,7 @@ async function doLogin() {
     renderSummary(data.summary || {});
     renderSiswaList(state.siswa);
     populateSiswaSelect();
+    renderLogAktivitas(data.log_aktivitas || []);
   } catch (err) {
     errorBox.textContent = 'Gagal menghubungi server. Coba lagi.';
     errorBox.style.display = 'block';
@@ -581,8 +677,8 @@ function renderSummary(s) {
     { num: s.total_belum_bayar || 0, label: 'Belum Bayar', accent: 'accent-red' },
     { num: s.total_absen_hari_ini || 0, label: 'Hadir Hari Ini', accent: 'accent-green' }
   ];
-  document.getElementById('summary-grid').innerHTML = cards.map(c => `
-    <div class="summary-card ${c.accent}">
+  document.getElementById('summary-grid').innerHTML = cards.map((c, i) => `
+    <div class="summary-card ${c.accent}" style="animation-delay: ${i * 0.06}s">
       <div class="summary-num mono">${c.num}</div>
       <div class="summary-label">${c.label}</div>
     </div>
@@ -607,8 +703,8 @@ function renderSiswaList(list) {
     container.innerHTML = '<div class="empty-state">Belum ada data siswa. Tambahkan lewat Google Sheets, akan tersinkron otomatis.</div>';
     return;
   }
-  container.innerHTML = list.map(s => `
-    <div class="siswa-row">
+  container.innerHTML = list.map((s, i) => `
+    <div class="siswa-row" style="animation-delay: ${Math.min(i * 0.04, 0.5)}s">
       <div class="siswa-info">
         <div class="siswa-nama">${escapeHtml(s.nama_siswa)}</div>
         <div class="siswa-kelas">Kelas ${escapeHtml(s.kelas || '-')}</div>
@@ -616,15 +712,65 @@ function renderSiswaList(list) {
       <div class="badges">
         ${statusSppBadge(s.status_spp)}
         ${absenBadge(s.absen_hari_ini)}
+        <button class="btn-reset-pw" data-siswa-id="${escapeHtml(s.siswa_id)}" data-nama="${escapeHtml(s.nama_siswa)}">Reset PW</button>
       </div>
     </div>
   `).join('');
+
+  container.querySelectorAll('.btn-reset-pw').forEach(btn => {
+    btn.addEventListener('click', () => resetPasswordSiswa(btn.dataset.siswaId, btn.dataset.nama));
+  });
+}
+
+async function resetPasswordSiswa(siswaId, namaSiswa) {
+  if (!confirm(`Reset password ${namaSiswa} ke default (NIS-nya sendiri)?`)) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/admin-reset-password-siswa`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ siswa_id: siswaId, school_id: state.schoolId, kode_akses: state.accessCode })
+    });
+    const data = await res.json();
+    alert(data.message);
+  } catch (err) {
+    alert('Gagal menghubungi server. Coba lagi.');
+  }
 }
 
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str || '';
   return div.innerHTML;
+}
+
+const JENIS_LABEL = {
+  login_admin: 'Login admin',
+  login_admin_gagal: 'Percobaan login admin gagal',
+  login_siswa: 'Login siswa/ortu',
+  login_siswa_gagal: 'Percobaan login gagal',
+  reset_password: 'Reset password siswa',
+  reset_password_gagal: 'Percobaan reset password gagal'
+};
+
+function renderLogAktivitas(list) {
+  const container = document.getElementById('log-aktivitas-list');
+  if (!list.length) {
+    container.innerHTML = '<div class="empty-state">Belum ada riwayat aktivitas.</div>';
+    return;
+  }
+  container.innerHTML = list.map((l, i) => {
+    const waktu = l.waktu ? new Date(l.waktu).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+    return `
+      <div class="log-row" style="animation-delay: ${Math.min(i * 0.03, 0.4)}s">
+        <div>
+          <div class="log-detail">${escapeHtml(JENIS_LABEL[l.jenis] || l.jenis)}</div>
+          <div class="log-waktu">${escapeHtml(l.detail)} &middot; ${waktu}</div>
+        </div>
+        <span class="log-status ${l.berhasil ? 'ok' : 'gagal'}">${l.berhasil ? 'Berhasil' : 'Gagal'}</span>
+      </div>
+    `;
+  }).join('');
 }
 
 document.getElementById('search-box').addEventListener('input', (e) => {
