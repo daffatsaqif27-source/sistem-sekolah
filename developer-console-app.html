@@ -261,19 +261,21 @@ document.addEventListener('error', (e) => {
 const API_BASE = 'https://n8n-d59325.app3.flaz.my.id/webhook';
 let state = {};
 
+const SVG_LOGO_FALLBACK_TOPBAR = '<svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 8.7 8 9 4.6-.3 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4.5"/></svg>';
+const SVG_LOGO_FALLBACK_PREVIEW = '<svg class="icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 8.7 8 9 4.6-.3 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4.5"/></svg>';
+function handleLogoImgError(imgEl, fallbackHtml) { imgEl.parentElement.innerHTML = fallbackHtml; }
+
 function applyLogo(logoUrl) {
   const badge = document.getElementById('topbar-icon-badge');
   const preview = document.getElementById('logo-preview');
-  const fallbackSvg = '<svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 8.7 8 9 4.6-.3 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4.5"/></svg>';
-  const previewFallback = '<svg class="icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 8.7 8 9 4.6-.3 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4.5"/></svg>';
 
   if (logoUrl) {
-    badge.innerHTML = `<img src="${escapeHtml(logoUrl)}" style="width:100%;height:100%;object-fit:contain" onerror="this.parentElement.innerHTML='${fallbackSvg.replace(/'/g, "\\'")}'">`;
-    preview.innerHTML = `<img src="${escapeHtml(logoUrl)}" onerror="this.parentElement.innerHTML='${previewFallback.replace(/'/g, "\\'")}'">`;
+    badge.innerHTML = `<img src="${escapeHtml(logoUrl)}" style="width:100%;height:100%;object-fit:contain" onerror="handleLogoImgError(this, SVG_LOGO_FALLBACK_TOPBAR)">`;
+    preview.innerHTML = `<img src="${escapeHtml(logoUrl)}" style="width:100%;height:100%;object-fit:contain" onerror="handleLogoImgError(this, SVG_LOGO_FALLBACK_PREVIEW)">`;
     document.getElementById('logo-url-input').value = logoUrl;
   } else {
-    badge.innerHTML = fallbackSvg;
-    preview.innerHTML = previewFallback;
+    badge.innerHTML = SVG_LOGO_FALLBACK_TOPBAR;
+    preview.innerHTML = SVG_LOGO_FALLBACK_PREVIEW;
   }
 }
 
