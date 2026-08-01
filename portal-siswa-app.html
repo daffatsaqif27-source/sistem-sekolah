@@ -97,7 +97,44 @@
   .empty-state { text-align: center; padding: 30px 20px; color: var(--ink-soft); font-size: 13.5px; }
   .must-reset-banner { background: var(--red-soft); color: var(--red); padding: 12px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
 
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes popIn {
+    0% { opacity: 0; transform: scale(0.6); }
+    70% { transform: scale(1.06); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .login-card { animation: scaleIn 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+  .view.active { animation: fadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+  .card, .biodata-row, .tagihan-row, .absen-row { animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .badge { animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  .must-reset-banner { animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+  button, .tab-btn { transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.2s ease; }
+  .btn-primary:active { transform: scale(0.97); }
+  .tagihan-row, .absen-row { transition: transform 0.15s ease; }
+
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
 </style>
 </head>
 <body>
@@ -242,10 +279,10 @@ async function doLogin() {
   }
 
   btn.disabled = true;
-  btn.textContent = 'Memeriksa...';
+  btn.innerHTML = '<span class="spinner"></span>Memeriksa...';
 
   try {
-    const res = await fetch(`${API_BASE}/portal-login`, {
+    const res = await fetch(`${API_BASE}/portal-login-v2`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ siswa_id: nis, password: pw })
@@ -326,8 +363,8 @@ function renderTagihan() {
     return;
   }
   const sorted = [...state.tagihan].sort((a, b) => (a.bulan < b.bulan ? 1 : -1));
-  container.innerHTML = sorted.map(t => `
-    <div class="tagihan-row">
+  container.innerHTML = sorted.map((t, i) => `
+    <div class="tagihan-row" style="animation-delay: ${i * 0.06}s">
       <div>
         <div class="tagihan-bulan">${escapeHtml(t.bulan)}</div>
         <div class="tagihan-nominal mono">Rp${Number(t.nominal || 0).toLocaleString('id-ID')}</div>
@@ -344,8 +381,8 @@ function renderAbsensi() {
     container.innerHTML = '<div class="empty-state">Belum ada riwayat absensi.</div>';
     return;
   }
-  container.innerHTML = state.riwayatAbsensi.map(a => `
-    <div class="absen-row">
+  container.innerHTML = state.riwayatAbsensi.map((a, i) => `
+    <div class="absen-row" style="animation-delay: ${i * 0.04}s">
       <span class="absen-tanggal">${escapeHtml(a.tanggal)}</span>
       <span class="badge ${a.status === 'telat' ? 'badge-telat' : 'badge-hadir'}">${a.status === 'telat' ? 'Telat' : 'Hadir'} ${escapeHtml(a.jam_masuk)}</span>
     </div>
@@ -368,7 +405,7 @@ document.getElementById('ganti-pw-btn').addEventListener('click', async () => {
   }
 
   btn.disabled = true;
-  btn.textContent = 'Menyimpan...';
+  btn.innerHTML = '<span class="spinner"></span>Menyimpan...';
 
   try {
     const res = await fetch(`${API_BASE}/portal-ganti-password`, {
