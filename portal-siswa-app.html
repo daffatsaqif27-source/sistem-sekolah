@@ -5,142 +5,135 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Portal Siswa &amp; Wali Murid</title>
 <link rel="manifest" id="manifest-link" href="./manifest-portal.json">
-<meta name="theme-color" id="theme-color-meta" content="#1B3A5C">
+<meta name="theme-color" id="theme-color-meta" content="#4F46E5">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Portal Siswa">
-<link rel="apple-touch-icon" id="apple-icon-link" href="https://api.iconify.design/mdi/account-school.svg?color=%231B3A5C&width=192&height=192">
+<link rel="apple-touch-icon" id="apple-icon-link" href="https://api.iconify.design/lucide/backpack.svg?color=%234F46E5&width=192&height=192">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy: #1B3A5C;
-    --navy-deep: #12283F;
-    --paper: #F6F3EC;
-    --paper-line: #E4DFD1;
-    --ink: #21262B;
-    --ink-soft: #5B6570;
-    --gold: #C9973B;
-    --green: #2F7D5B;
-    --green-soft: #E4F1EA;
-    --red: #C0502D;
-    --red-soft: #F7E7DF;
-    --white: #FFFFFF;
-    --radius: 10px;
+    --primary: #4F46E5;
+    --primary-dark: #3730A3;
+    --primary-soft: #EEF0FF;
+    --bg: #F4F5FA;
+    --surface: #FFFFFF;
+    --border: #E7E8F0;
+    --ink: #16151F;
+    --ink-soft: #6B7280;
+    --success: #10B981;
+    --success-soft: #D1FAE5;
+    --warning: #F59E0B;
+    --warning-soft: #FEF3C7;
+    --danger: #EF4444;
+    --danger-soft: #FEE2E2;
+    --radius-xl: 28px;
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-pill: 999px;
+    --shadow-sm: 0 1px 3px rgba(22,21,31,0.06);
+    --shadow-md: 0 8px 24px rgba(22,21,31,0.08);
+    --shadow-lg: 0 24px 60px rgba(22,21,31,0.22);
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'IBM Plex Sans', sans-serif; min-height: 100vh; }
-  .display { font-family: 'Fraunces', serif; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; min-height: 100vh; }
+  .display { font-family: 'Sora', sans-serif; }
   .mono { font-family: 'IBM Plex Mono', monospace; }
+  .icon { display: inline-block; vertical-align: middle; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+  @keyframes popIn { 0% { opacity: 0; transform: scale(0.6); } 70% { transform: scale(1.06); } 100% { opacity: 1; transform: scale(1); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes floatBlob { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(20px,-16px) scale(1.06); } }
 
   #login-screen {
     min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
-    background: linear-gradient(var(--navy-deep), var(--navy-deep)), repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(255,255,255,0.035) 28px);
+    background: linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 100%);
+    position: relative; overflow: hidden;
   }
-  .login-card { background: var(--paper); border-radius: var(--radius); max-width: 380px; width: 100%; padding: 36px 32px; box-shadow: 0 24px 60px rgba(0,0,0,0.35); position: relative; overflow: hidden; }
-  .login-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--gold), var(--navy)); }
-  .login-eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 6px; }
-  .login-title { font-size: 24px; font-weight: 600; color: var(--navy-deep); margin: 0 0 4px; }
-  .login-sub { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 26px; line-height: 1.5; }
-  label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-soft); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
-  input[type=text], input[type=password] { width: 100%; padding: 12px 14px; border: 1.5px solid var(--paper-line); border-radius: 8px; font-size: 15px; font-family: inherit; background: var(--white); color: var(--ink); margin-bottom: 18px; outline: none; transition: border-color 0.15s; }
-  input:focus { border-color: var(--navy); }
+  .blob { position: absolute; border-radius: 50%; filter: blur(50px); opacity: 0.35; animation: floatBlob 9s ease-in-out infinite; }
+  .blob-1 { width: 280px; height: 280px; background: #818CF8; top: -60px; left: -60px; }
+  .blob-2 { width: 320px; height: 320px; background: #22D3EE; bottom: -80px; right: -60px; animation-delay: -4s; }
+
+  .login-card { background: var(--surface); border-radius: var(--radius-xl); max-width: 380px; width: 100%; padding: 40px 32px; box-shadow: var(--shadow-lg); position: relative; z-index: 1; animation: scaleIn 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+  .login-icon-badge { width: 52px; height: 52px; border-radius: 16px; background: var(--primary-soft); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+  .login-eyebrow { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--primary); font-weight: 700; margin-bottom: 6px; }
+  .login-title { font-size: 24px; font-weight: 700; color: var(--ink); margin: 0 0 6px; }
+  .login-sub { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 26px; line-height: 1.55; }
+  label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); margin-bottom: 7px; }
+  input[type=text], input[type=password] { width: 100%; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: var(--radius-md); font-size: 15px; font-family: inherit; background: var(--bg); color: var(--ink); margin-bottom: 18px; outline: none; transition: border-color 0.15s, background 0.15s; }
+  input:focus { border-color: var(--primary); background: var(--surface); }
   button { font-family: inherit; cursor: pointer; border: none; }
-  .btn-primary { width: 100%; background: var(--navy); color: var(--white); padding: 13px; border-radius: 8px; font-size: 15px; font-weight: 600; transition: background 0.15s; }
-  .btn-primary:hover { background: var(--navy-deep); }
+  .btn-primary { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; padding: 14px; border-radius: var(--radius-pill); font-size: 15px; font-weight: 700; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 8px 20px rgba(79,70,229,0.35); }
+  .btn-primary:hover { box-shadow: 0 10px 24px rgba(79,70,229,0.45); }
+  .btn-primary:active { transform: scale(0.97); }
   .btn-primary:disabled { opacity: 0.5; cursor: default; }
-  .alert-box { font-size: 13px; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; display: none; }
-  .alert-error { background: var(--red-soft); color: var(--red); }
-  .alert-success { background: var(--green-soft); color: var(--green); }
+  .alert-box { font-size: 13px; padding: 11px 14px; border-radius: var(--radius-md); margin-bottom: 16px; display: none; }
+  .alert-error { background: var(--danger-soft); color: var(--danger); }
+  .alert-success { background: var(--success-soft); color: var(--success); }
   .login-hint { font-size: 11.5px; color: var(--ink-soft); margin-top: -10px; margin-bottom: 18px; line-height: 1.5; }
 
   #app-screen { display: none; min-height: 100vh; }
-  header.topbar { background: var(--navy-deep); color: var(--white); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 20; }
-  .topbar-title { display: flex; flex-direction: column; }
-  .topbar-eyebrow { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
-  .topbar-nama { font-size: 16px; font-weight: 600; font-family: 'Fraunces', serif; }
-  .btn-logout { background: transparent; color: rgba(255,255,255,0.7); font-size: 12px; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.25); }
-  .btn-logout:hover { color: white; border-color: white; }
+  header.topbar { background: linear-gradient(120deg, var(--primary), var(--primary-dark)); color: #fff; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 20; border-radius: 0 0 24px 24px; }
+  .topbar-title { display: flex; align-items: center; gap: 12px; }
+  #topbar-logo { width: 36px; height: 36px; border-radius: 12px; object-fit: cover; display: none; }
+  .topbar-eyebrow { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #C7D2FE; font-weight: 700; display: block; }
+  .topbar-nama { font-size: 16px; font-weight: 700; font-family: 'Sora', sans-serif; }
+  .btn-logout { background: rgba(255,255,255,0.14); color: #fff; font-size: 12.5px; font-weight: 600; padding: 8px 14px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 6px; }
+  .btn-logout:hover { background: rgba(255,255,255,0.24); }
 
-  nav.tabs { display: flex; background: var(--white); border-bottom: 1px solid var(--paper-line); position: sticky; top: 60px; z-index: 19; overflow-x: auto; }
-  .tab-btn { flex: 1; min-width: 90px; background: none; padding: 14px 8px; font-size: 13px; font-weight: 600; color: var(--ink-soft); border-bottom: 3px solid transparent; white-space: nowrap; }
-  .tab-btn.active { color: var(--navy); border-bottom-color: var(--gold); }
+  nav.tabs { display: flex; gap: 4px; background: var(--surface); margin: 12px 16px 0; padding: 5px; border-radius: var(--radius-pill); box-shadow: var(--shadow-sm); position: sticky; top: 78px; z-index: 19; overflow-x: auto; }
+  .tab-btn { flex: 1; min-width: 80px; background: none; padding: 10px 6px; font-size: 12px; font-weight: 600; color: var(--ink-soft); border-radius: var(--radius-pill); display: flex; align-items: center; justify-content: center; gap: 5px; transition: color 0.2s, background 0.2s; white-space: nowrap; }
+  .tab-btn.active { color: #fff; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
 
   main { max-width: 640px; margin: 0 auto; padding: 20px 16px 60px; }
   .view { display: none; }
-  .view.active { display: block; }
+  .view.active { display: block; animation: fadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
 
-  .card { background: var(--white); border: 1px solid var(--paper-line); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
-  .biodata-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--paper-line); font-size: 14px; }
+  .card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); margin-bottom: 12px; animation: fadeSlideUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+  .biodata-row { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
   .biodata-row:last-child { border-bottom: none; }
-  .biodata-label { color: var(--ink-soft); }
-  .biodata-value { font-weight: 600; text-align: right; }
+  .biodata-icon { width: 30px; height: 30px; border-radius: 9px; background: var(--primary-soft); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .biodata-label { color: var(--ink-soft); font-size: 11.5px; }
+  .biodata-value { font-weight: 700; }
 
-  .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); font-weight: 600; margin: 20px 0 10px; }
+  .section-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); font-weight: 700; margin: 22px 0 12px; display: flex; align-items: center; gap: 6px; }
 
-  .tagihan-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--paper-line); }
+  .tagihan-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
   .tagihan-row:last-child { border-bottom: none; }
-  .tagihan-bulan { font-weight: 600; font-size: 14px; }
+  .tagihan-bulan { font-weight: 700; font-size: 14px; }
   .tagihan-nominal { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
-  .badge { font-size: 10.5px; font-weight: 600; padding: 4px 9px; border-radius: 20px; white-space: nowrap; }
-  .badge-lunas { background: var(--green-soft); color: var(--green); }
-  .badge-belum { background: var(--red-soft); color: var(--red); }
-  .link-bayar { display: inline-block; margin-top: 6px; font-size: 12.5px; color: var(--navy); font-weight: 600; }
+  .badge { font-size: 10.5px; font-weight: 700; padding: 5px 10px; border-radius: var(--radius-pill); white-space: nowrap; animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  .badge-lunas { background: var(--success-soft); color: var(--success); }
+  .badge-belum { background: var(--danger-soft); color: var(--danger); }
+  .link-bayar { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; font-size: 12.5px; color: var(--primary); font-weight: 700; }
 
-  .absen-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--paper-line); font-size: 13.5px; }
+  .absen-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
   .absen-row:last-child { border-bottom: none; }
   .absen-tanggal { color: var(--ink-soft); }
-  .badge-hadir { background: var(--green-soft); color: var(--green); }
-  .badge-telat { background: #FBF0DC; color: #97701E; }
+  .badge-hadir { background: var(--success-soft); color: var(--success); }
+  .badge-telat { background: var(--warning-soft); color: #97701E; }
 
-  .empty-state { text-align: center; padding: 30px 20px; color: var(--ink-soft); font-size: 13.5px; }
-  .must-reset-banner { background: var(--red-soft); color: var(--red); padding: 12px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--ink-soft); font-size: 13.5px; }
+  .empty-state .icon { margin-bottom: 12px; opacity: 0.4; }
+  .must-reset-banner { background: var(--warning-soft); color: #92650E; padding: 14px 16px; border-radius: var(--radius-md); font-size: 13px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
-
-  /* ===== ANIMATIONS ===== */
-  @keyframes fadeSlideUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.94); }
-    to { opacity: 1; transform: scale(1); }
-  }
-  @keyframes popIn {
-    0% { opacity: 0; transform: scale(0.6); }
-    70% { transform: scale(1.06); }
-    100% { opacity: 1; transform: scale(1); }
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .login-card { animation: scaleIn 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
-  .view.active { animation: fadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
-  .card, .biodata-row, .tagihan-row, .absen-row { animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
-  .badge { animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
-  .must-reset-banner { animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-
-  button, .tab-btn { transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.2s ease; }
-  .btn-primary:active { transform: scale(0.97); }
-  .tagihan-row, .absen-row { transition: transform 0.15s ease; }
-
-  .spinner {
-    display: inline-block;
-    width: 14px; height: 14px;
-    border: 2px solid rgba(255,255,255,0.4);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-    vertical-align: middle;
-    margin-right: 6px;
-  }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
 </style>
 </head>
 <body>
 
 <div id="login-screen">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
   <div class="login-card">
+    <div class="login-icon-badge">
+      <svg class="icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+    </div>
     <div class="login-eyebrow">Agentix AI &middot; Portal Sekolah</div>
     <h1 class="login-title display">Masuk Portal</h1>
     <p class="login-sub">Untuk siswa dan wali murid. Masuk pakai Nomor Induk Siswa (NIS) dan password.</p>
@@ -156,45 +149,64 @@
 
 <div id="app-screen">
   <header class="topbar">
-    <div class="topbar-title" style="flex-direction: row; align-items: center; gap: 10px;">
-      <img id="topbar-logo" src="" alt="" style="display:none; width:32px; height:32px; border-radius:6px; object-fit:cover;">
-      <div class="topbar-title">
+    <div class="topbar-title">
+      <img id="topbar-logo" src="" alt="">
+      <div>
         <span class="topbar-eyebrow">Portal siswa</span>
         <span class="topbar-nama" id="nama-siswa-label">&mdash;</span>
       </div>
     </div>
-    <button class="btn-logout" id="logout-btn">Keluar</button>
+    <button class="btn-logout" id="logout-btn">
+      <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3"/><path d="m15 16 4-4-4-4"/><path d="M19 12H9"/></svg>Keluar
+    </button>
   </header>
 
   <nav class="tabs">
-    <button class="tab-btn active" data-view="biodata-view">Biodata</button>
-    <button class="tab-btn" data-view="tagihan-view">Tagihan</button>
-    <button class="tab-btn" data-view="absen-view">Absensi</button>
-    <button class="tab-btn" data-view="password-view">Ganti Password</button>
+    <button class="tab-btn active" data-view="biodata-view">
+      <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>Biodata
+    </button>
+    <button class="tab-btn" data-view="tagihan-view">
+      <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14v18l-2.5-1.5L14 21l-2-1.5L10 21l-2.5-1.5L5 21V3Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Tagihan
+    </button>
+    <button class="tab-btn" data-view="absen-view">
+      <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="m9 15 2 2 4-4"/></svg>Absensi
+    </button>
+    <button class="tab-btn" data-view="password-view">
+      <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Password
+    </button>
   </nav>
 
   <main>
     <div id="must-reset-banner" class="must-reset-banner" style="display:none">
-      Ini login pertama kamu. Demi keamanan, segera ganti password lewat tab "Ganti Password".
+      <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#92650E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.5" fill="currentColor" stroke="none"/></svg>
+      Ini login pertama kamu. Demi keamanan, segera ganti password lewat tab "Password".
     </div>
 
     <div class="view active" id="biodata-view">
-      <div class="section-label">Biodata Siswa</div>
+      <div class="section-label">
+        <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>Biodata Siswa
+      </div>
       <div class="card" id="biodata-card"></div>
     </div>
 
     <div class="view" id="tagihan-view">
-      <div class="section-label">Riwayat Tagihan SPP</div>
+      <div class="section-label">
+        <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14v18l-2.5-1.5L14 21l-2-1.5L10 21l-2.5-1.5L5 21V3Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Riwayat Tagihan SPP
+      </div>
       <div class="card" id="tagihan-card"></div>
     </div>
 
     <div class="view" id="absen-view">
-      <div class="section-label">Riwayat Absensi (14 Hari Terakhir)</div>
+      <div class="section-label">
+        <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="m9 15 2 2 4-4"/></svg>Riwayat Absensi (14 Hari Terakhir)
+      </div>
       <div class="card" id="absen-card"></div>
     </div>
 
     <div class="view" id="password-view">
-      <div class="section-label">Ganti Password</div>
+      <div class="section-label">
+        <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Ganti Password
+      </div>
       <div class="card">
         <div class="alert-box alert-error" id="pw-error"></div>
         <div class="alert-box alert-success" id="pw-success"></div>
@@ -209,12 +221,48 @@
 </div>
 
 <script>
+
+const ICON_SVG = {
+  "check": `<circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/>`,
+  "alert": `<path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.5" fill="currentColor" stroke="none"/>`,
+  "clock": `<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>`,
+  "user": `<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>`,
+  "users": `<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/><path d="M16 4.5c2 .3 3.5 2 3.5 4s-1.5 3.7-3.5 4"/><path d="M19 13.5c2.3.6 4 2.7 4 6.5"/>`,
+  "building": `<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/><path d="M10 21v-4h4v4"/>`,
+  "wallet": `<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1"/>`,
+  "calendar": `<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="m9 15 2 2 4-4"/>`,
+  "lock": `<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>`,
+  "history": `<path d="M4 12a8 8 0 1 0 2.7-6"/><path d="M2.5 4v4.5H7"/><path d="M12 8v4l3 2"/>`,
+  "logout": `<path d="M9 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3"/><path d="m15 16 4-4-4-4"/><path d="M19 12H9"/>`,
+  "card": `<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/>`,
+  "wifi": `<path d="M2 9a15 15 0 0 1 20 0"/><path d="M5.5 13a10 10 0 0 1 13 0"/><path d="M9 17a5 5 0 0 1 6 0"/><circle cx="12" cy="20" r="0.7" fill="currentColor" stroke="none"/>`,
+  "phone": `<path d="M4 4c0 9.4 6.6 16 16 16l2-4-5-2-2 2c-2-1-4.4-3.3-5.4-5.4L11.6 8l-2-5L6 4Z"/>`,
+  "hash": `<path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16"/>`,
+  "arrow-right": `<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>`,
+  "shield": `<path d="M12 3 4 6v6c0 5 3.4 8.7 8 9 4.6-.3 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4.5"/>`,
+  "chart": `<path d="M4 20V10"/><path d="M12 20V4"/><path d="M20 20v-7"/><path d="M2 20h20"/>`,
+  "search": `<circle cx="9" cy="9" r="6"/><path d="M2 21a7 7 0 0 1 8-6.9"/><circle cx="17" cy="17" r="3"/><path d="m21 21-1.7-1.7"/>`,
+  "info": `<circle cx="12" cy="12" r="9"/><path d="M12 16v-5"/><circle cx="12" cy="8" r="0.6" fill="currentColor" stroke="none"/>`,
+  "help": `<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.6 1.3c0 1.7-2.6 2-2.6 3.7"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/>`,
+  "scan": `<path d="M4 7V5a1 1 0 0 1 1-1h2"/><path d="M17 4h2a1 1 0 0 1 1 1v2"/><path d="M20 17v2a1 1 0 0 1-1 1h-2"/><path d="M7 20H5a1 1 0 0 1-1-1v-2"/><path d="M4 12h16"/>`,
+  "grid": `<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/>`,
+  "bag": `<path d="M6 8h12l1 12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>`,
+  "receipt": `<path d="M5 3h14v18l-2.5-1.5L14 21l-2-1.5L10 21l-2.5-1.5L5 21V3Z"/><path d="M8 8h8M8 12h8M8 16h5"/>`
+};
+function ic(name, size, color) {
+  return `<svg class="icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON_SVG[name] || ICON_SVG.info}</svg>`;
+}
+
+document.addEventListener('error', (e) => {
+  if (e.target && e.target.tagName === 'IMG' && e.target.classList.contains('icon')) {
+    e.target.style.visibility = 'hidden';
+  }
+}, true);
+
 const API_BASE = 'https://n8n-d59325.app3.flaz.my.id/webhook';
 let state = { siswaId: '', biodata: {}, tagihan: [], riwayatAbsensi: [] };
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(() => {});
-}
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').catch(() => {}); }
 
 function shadeColor(hex, percent) {
   try {
@@ -225,18 +273,16 @@ function shadeColor(hex, percent) {
     g = Math.max(0, Math.min(255, Math.floor(g * (1 + percent / 100))));
     b = Math.max(0, Math.min(255, Math.floor(b * (1 + percent / 100))));
     return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
-  } catch (e) {
-    return hex;
-  }
+  } catch (e) { return hex; }
 }
 
 function applyBranding(namaSekolah, logoUrl, warnaTema) {
   const isValidHex = /^#[0-9A-Fa-f]{6}$/.test(warnaTema || '');
-  const primary = isValidHex ? warnaTema : '#1B3A5C';
-  const deep = isValidHex ? shadeColor(primary, -30) : '#12283F';
+  const primary = isValidHex ? warnaTema : '#4F46E5';
+  const dark = isValidHex ? shadeColor(primary, -30) : '#3730A3';
 
-  document.documentElement.style.setProperty('--navy', primary);
-  document.documentElement.style.setProperty('--navy-deep', deep);
+  document.documentElement.style.setProperty('--primary', primary);
+  document.documentElement.style.setProperty('--primary-dark', dark);
   document.getElementById('theme-color-meta').setAttribute('content', primary);
 
   const topbarLogo = document.getElementById('topbar-logo');
@@ -251,11 +297,11 @@ function applyBranding(namaSekolah, logoUrl, warnaTema) {
     short_name: namaSekolah || 'Portal Siswa',
     start_url: './portal-siswa-app.html',
     display: 'standalone',
-    background_color: '#F6F3EC',
+    background_color: '#F4F5FA',
     theme_color: primary,
     icons: [
-      { src: logoUrl || 'https://api.iconify.design/mdi/account-school.svg?color=%231B3A5C&width=192&height=192', sizes: '192x192', type: logoUrl ? 'image/png' : 'image/svg+xml' },
-      { src: logoUrl || 'https://api.iconify.design/mdi/account-school.svg?color=%231B3A5C&width=512&height=512', sizes: '512x512', type: logoUrl ? 'image/png' : 'image/svg+xml' }
+      { src: logoUrl || 'https://api.iconify.design/lucide/backpack.svg?color=%234F46E5&width=192&height=192', sizes: '192x192', type: logoUrl ? 'image/png' : 'image/svg+xml' },
+      { src: logoUrl || 'https://api.iconify.design/lucide/backpack.svg?color=%234F46E5&width=512&height=512', sizes: '512x512', type: logoUrl ? 'image/png' : 'image/svg+xml' }
     ]
   };
   const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
@@ -308,7 +354,7 @@ async function doLogin() {
     document.getElementById('nama-siswa-label').textContent = state.biodata.nama_siswa;
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-screen').style.display = 'block';
-    document.getElementById('must-reset-banner').style.display = data.must_reset_password ? 'block' : 'none';
+    document.getElementById('must-reset-banner').style.display = data.must_reset_password ? 'flex' : 'none';
 
     renderBiodata();
     renderTagihan();
@@ -347,19 +393,28 @@ function escapeHtml(str) {
 
 function renderBiodata() {
   const b = state.biodata;
-  document.getElementById('biodata-card').innerHTML = `
-    <div class="biodata-row"><span class="biodata-label">Nomor Induk</span><span class="biodata-value">${escapeHtml(b.siswa_id)}</span></div>
-    <div class="biodata-row"><span class="biodata-label">Nama</span><span class="biodata-value">${escapeHtml(b.nama_siswa)}</span></div>
-    <div class="biodata-row"><span class="biodata-label">Kelas</span><span class="biodata-value">${escapeHtml(b.kelas)}</span></div>
-    <div class="biodata-row"><span class="biodata-label">No. WA Wali</span><span class="biodata-value">${escapeHtml(b.no_wa_ortu)}</span></div>
-    <div class="biodata-row"><span class="biodata-label">SPP per Bulan</span><span class="biodata-value mono">Rp${Number(b.nominal_spp || 0).toLocaleString('id-ID')}</span></div>
-  `;
+  const rows = [
+    { icon: 'hash', label: 'Nomor Induk', value: b.siswa_id },
+    { icon: 'user', label: 'Nama', value: b.nama_siswa },
+    { icon: 'building', label: 'Kelas', value: b.kelas },
+    { icon: 'phone', label: 'No. WA Wali', value: b.no_wa_ortu },
+    { icon: 'wallet', label: 'SPP per Bulan', value: 'Rp' + Number(b.nominal_spp || 0).toLocaleString('id-ID') }
+  ];
+  document.getElementById('biodata-card').innerHTML = rows.map(r => `
+    <div class="biodata-row">
+      <div class="biodata-icon">${ic(r.icon, 15, '#4F46E5')}</div>
+      <div style="flex:1">
+        <div class="biodata-label">${r.label}</div>
+        <div class="biodata-value">${escapeHtml(r.value)}</div>
+      </div>
+    </div>
+  `).join('');
 }
 
 function renderTagihan() {
   const container = document.getElementById('tagihan-card');
   if (!state.tagihan.length) {
-    container.innerHTML = '<div class="empty-state">Belum ada tagihan tercatat.</div>';
+    container.innerHTML = `<div class="empty-state">${ic('receipt', 40, '#6B7280')}<div>Belum ada tagihan tercatat.</div></div>`;
     return;
   }
   const sorted = [...state.tagihan].sort((a, b) => (a.bulan < b.bulan ? 1 : -1));
@@ -368,7 +423,7 @@ function renderTagihan() {
       <div>
         <div class="tagihan-bulan">${escapeHtml(t.bulan)}</div>
         <div class="tagihan-nominal mono">Rp${Number(t.nominal || 0).toLocaleString('id-ID')}</div>
-        ${t.status !== 'lunas' && t.midtrans_snap_url ? `<a class="link-bayar" href="${escapeHtml(t.midtrans_snap_url)}" target="_blank" rel="noopener">Bayar sekarang &rarr;</a>` : ''}
+        ${t.status !== 'lunas' && t.midtrans_snap_url ? `<a class="link-bayar" href="${escapeHtml(t.midtrans_snap_url)}" target="_blank" rel="noopener">Bayar sekarang ${ic('arrow-right', 12, '#4F46E5')}</a>` : ''}
       </div>
       <span class="badge ${t.status === 'lunas' ? 'badge-lunas' : 'badge-belum'}">${t.status === 'lunas' ? 'Lunas' : 'Belum bayar'}</span>
     </div>
@@ -378,7 +433,7 @@ function renderTagihan() {
 function renderAbsensi() {
   const container = document.getElementById('absen-card');
   if (!state.riwayatAbsensi.length) {
-    container.innerHTML = '<div class="empty-state">Belum ada riwayat absensi.</div>';
+    container.innerHTML = `<div class="empty-state">${ic('calendar', 40, '#6B7280')}<div>Belum ada riwayat absensi.</div></div>`;
     return;
   }
   container.innerHTML = state.riwayatAbsensi.map((a, i) => `
