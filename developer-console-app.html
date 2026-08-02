@@ -174,9 +174,14 @@
         <span class="topbar-title-text">Developer Console</span>
       </div>
     </div>
-    <button class="btn-logout" id="logout-btn">
-      <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3"/><path d="m15 16 4-4-4-4"/><path d="M19 12H9"/></svg>Keluar
-    </button>
+    <div style="display:flex; gap:8px;">
+      <button class="btn-logout" id="refresh-btn" title="Refresh data">
+        <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.7-6"/><path d="M2.5 4v4.5H7"/></svg>
+      </button>
+      <button class="btn-logout" id="logout-btn">
+        <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3"/><path d="m15 16 4-4-4-4"/><path d="M19 12H9"/></svg>Keluar
+      </button>
+    </div>
   </header>
 
   <nav class="tabs">
@@ -191,6 +196,9 @@
     </button>
     <button class="tab-btn" data-view="log-view">
       <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M12 20V4"/><path d="M20 20v-7"/><path d="M2 20h20"/></svg>Log Global
+    </button>
+    <button class="tab-btn" data-view="afiliat-view">
+      <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/><path d="M16 4.5c2 .3 3.5 2 3.5 4s-1.5 3.7-3.5 4"/><path d="M19 13.5c2.3.6 4 2.7 4 6.5"/></svg>Afiliat
     </button>
     <button class="tab-btn" data-view="settings-view">
       <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Pengaturan
@@ -249,6 +257,31 @@
         <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M12 20V4"/><path d="M20 20v-7"/><path d="M2 20h20"/></svg>Log Aktivitas Seluruh Sistem (50 Terakhir)
       </div>
       <div id="log-list"></div>
+    </div>
+
+    <div class="view" id="afiliat-view">
+      <div class="section-label" style="justify-content:space-between">
+        <span style="display:flex; align-items:center; gap:6px;">
+          <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/><path d="M16 4.5c2 .3 3.5 2 3.5 4s-1.5 3.7-3.5 4"/><path d="M19 13.5c2.3.6 4 2.7 4 6.5"/></svg>Afiliat
+        </span>
+        <button class="btn-reset-pw" id="toggle-tambah-afiliat-btn" style="padding:6px 12px;">+ Tambah Afiliat</button>
+      </div>
+
+      <div class="card" id="tambah-afiliat-card" style="display:none">
+        <div class="alert-box alert-error" id="tambah-afiliat-error"></div>
+        <div class="alert-box alert-success" id="tambah-afiliat-success"></div>
+        <label for="new-afiliat-nama-input">Nama Afiliat</label>
+        <input type="text" id="new-afiliat-nama-input" placeholder="Contoh: Budi Santoso">
+        <label for="new-afiliat-wa-input">No. WA</label>
+        <input type="text" id="new-afiliat-wa-input" placeholder="Contoh: 628123456789">
+        <label for="new-afiliat-catatan-input">Catatan (opsional)</label>
+        <input type="text" id="new-afiliat-catatan-input" placeholder="Contoh: Kenalan dari komunitas guru">
+        <label for="kode-akses-developer-konfirmasi-2">Konfirmasi Kode Akses Developer</label>
+        <input type="text" id="kode-akses-developer-konfirmasi-2" placeholder="Wajib diisi">
+        <button class="btn-primary" id="simpan-afiliat-baru-btn">Tambah Afiliat</button>
+      </div>
+
+      <div id="afiliat-list"></div>
     </div>
 
     <div class="view" id="penagihan-view">
@@ -412,7 +445,11 @@ async function doLogin() {
     renderSummary(data.summary || {});
     state.tarif_per_siswa = data.tarif_per_siswa || 0;
     renderSekolahList(data.sekolah_list || []);
+    state.afiliat_list = data.afiliat_list || [];
     renderPenagihan(data.sekolah_list || []);
+    renderAfiliat(state.afiliat_list);
+    state.afiliat_list = data.afiliat_list || [];
+    renderAfiliat(state.afiliat_list);
     document.getElementById('tarif-input').value = state.tarif_per_siswa || '';
     renderLogGlobal(data.log_aktivitas || []);
     applyLogo(data.logo_url || '');
@@ -424,6 +461,12 @@ async function doLogin() {
   btn.disabled = false;
   btn.textContent = 'Masuk';
 }
+
+document.getElementById('refresh-btn').addEventListener('click', () => {
+  const btn = document.getElementById('refresh-btn');
+  btn.querySelector('svg').style.animation = 'spin 0.6s linear';
+  doLogin().finally(() => { setTimeout(() => { btn.querySelector('svg').style.animation = ''; }, 600); });
+});
 
 document.getElementById('logout-btn').addEventListener('click', () => {
   state = {};
@@ -455,7 +498,8 @@ function renderSummary(s) {
     { num: 'Rp' + Number(s.total_nominal_terkumpul_bulan_ini || 0).toLocaleString('id-ID'), label: 'Volume SPP Terkumpul (milik sekolah, bukan Agentix)', icon: 'wallet' },
     { num: 'Rp' + Number(s.total_pendapatan_langganan_bulan_ini || 0).toLocaleString('id-ID'), label: 'Pendapatan Langganan Bulan Ini', icon: 'chart' },
     { num: s.total_langganan_belum_bayar || 0, label: 'Sekolah Belum Bayar Langganan', icon: 'alert' },
-    { num: s.total_sekolah_setup_kurang || 0, label: 'Sekolah Setup Belum Lengkap', icon: 'help' }
+    { num: s.total_sekolah_setup_kurang || 0, label: 'Sekolah Setup Belum Lengkap', icon: 'help' },
+    { num: 'Rp' + Number(s.total_komisi_belum_dibayar || 0).toLocaleString('id-ID'), label: 'Komisi Afiliat Belum Dibayar', icon: 'wallet' }
   ];
   document.getElementById('summary-grid').innerHTML = cards.map((c, i) => `
     <div class="summary-card" style="animation-delay: ${i * 0.06}s">
@@ -529,6 +573,15 @@ function toggleEditPanel(schoolId) {
     <input type="text" id="edit-warna-${schoolId}" placeholder="#4F46E5" value="${escapeHtml(s.warna_tema || '')}">
     <label>Link Logo</label>
     <input type="url" id="edit-logo-${schoolId}" placeholder="https://..." value="${escapeHtml(s.logo_url || '')}">
+    <label>Tarif per Siswa Custom (Rp, kosongkan buat pakai tarif default)</label>
+    <input type="text" id="edit-tarif-${schoolId}" placeholder="Kosongkan = pakai default" value="${s.tarif_per_siswa_custom ? s.tarif_per_siswa_custom : ''}">
+    <label>Afiliat yang Menangani</label>
+    <select id="edit-afiliat-${schoolId}">
+      <option value="">Tidak ada afiliat</option>
+      ${(state.afiliat_list || []).map(a => `<option value="${escapeHtml(a.afiliat_id)}" ${s.afiliat_id === a.afiliat_id ? 'selected' : ''}>${escapeHtml(a.nama)}</option>`).join('')}
+    </select>
+    <label>Komisi Afiliat (% dari tagihan)</label>
+    <input type="text" id="edit-komisi-${schoolId}" placeholder="Contoh: 20" value="${s.komisi_afiliat_persen || ''}">
     <label>Konfirmasi Kode Akses Developer</label>
     <input type="text" id="edit-kode-dev-${schoolId}" placeholder="Wajib diisi">
     <button class="btn-primary" data-save-for="${schoolId}">Simpan Perubahan</button>
@@ -563,7 +616,11 @@ async function simpanEditSekolah(schoolId) {
   }
 
   const alamat = document.getElementById(`edit-alamat-${schoolId}`).value.trim();
-  const payload = { action: 'update', kode_akses: kodeDev, school_id: schoolId, status_langganan: status, warna_tema: warna, logo_url: logo, alamat: alamat };
+  const tarifCustom = document.getElementById(`edit-tarif-${schoolId}`).value.trim();
+  const afiliatId = document.getElementById(`edit-afiliat-${schoolId}`).value;
+  const komisi = document.getElementById(`edit-komisi-${schoolId}`).value.trim();
+  const payload = { action: 'update', kode_akses: kodeDev, school_id: schoolId, status_langganan: status, warna_tema: warna, logo_url: logo, alamat: alamat, afiliat_id: afiliatId, komisi_afiliat_persen: komisi ? Number(komisi) : 0 };
+  if (tarifCustom) payload.tarif_per_siswa_custom = Number(tarifCustom);
   if (kodeAdmin) payload.kode_akses_admin = kodeAdmin;
 
   try {
@@ -743,6 +800,401 @@ async function terapkanDiskon(schoolId) {
     alert('Gagal menghubungi server.');
   }
 }
+
+let afiliatDataById = {};
+
+function renderAfiliat(list) {
+  const container = document.getElementById('afiliat-list');
+  afiliatDataById = {};
+  list.forEach(a => { afiliatDataById[a.afiliat_id] = a; });
+
+  if (!list.length) {
+    container.innerHTML = `<div class="empty-state">${ic('users', 40, '#6B7280')}<div>Belum ada afiliat terdaftar.</div></div>`;
+    return;
+  }
+  container.innerHTML = list.map((a, i) => `
+    <div class="sekolah-row" style="animation-delay: ${i * 0.05}s">
+      <div class="sekolah-left">
+        <div class="avatar" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); width:38px; height:38px; border-radius:11px; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0;">${escapeHtml((a.nama || '?').slice(0,2).toUpperCase())}</div>
+        <div>
+          <div class="sekolah-nama">${escapeHtml(a.nama)} ${a.aktif === false ? '<span class="badge badge-nonaktif">Nonaktif</span>' : ''}</div>
+          <div class="sekolah-meta">${a.jumlah_sekolah} sekolah ditangani${a.nama_sekolah_ditangani && a.nama_sekolah_ditangani.length ? ': ' + a.nama_sekolah_ditangani.map(escapeHtml).join(', ') : ''}</div>
+          <div style="display:flex; gap:14px; margin-top:6px; font-size:12px;">
+            <span style="color:var(--danger); font-weight:700;">Belum dibayar: Rp${Number(a.saldo_belum_dibayar).toLocaleString('id-ID')}</span>
+            <span style="color:var(--ink-soft);">Total pernah dibayar: Rp${Number(a.total_pernah_dibayar).toLocaleString('id-ID')}</span>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            ${a.saldo_belum_dibayar > 0 ? `<button class="btn-retry" data-bayar-komisi="${escapeHtml(a.afiliat_id)}">Tandai Lunas Semua</button>` : ''}
+            <button class="btn-retry" data-edit-afiliat="${escapeHtml(a.afiliat_id)}">Edit</button>
+            <button class="btn-retry" style="background:var(--danger-soft); color:var(--danger);" data-hapus-afiliat="${escapeHtml(a.afiliat_id)}">Hapus</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sekolah-edit-panel" id="afiliat-edit-panel-${escapeHtml(a.afiliat_id)}" style="display:none"></div>
+  `).join('');
+
+  container.querySelectorAll('[data-bayar-komisi]').forEach(btn => {
+    btn.addEventListener('click', () => bayarKomisiAfiliat(btn.dataset.bayarKomisi));
+  });
+  container.querySelectorAll('[data-edit-afiliat]').forEach(btn => {
+    btn.addEventListener('click', () => toggleEditAfiliatPanel(btn.dataset.editAfiliat));
+  });
+  container.querySelectorAll('[data-hapus-afiliat]').forEach(btn => {
+    btn.addEventListener('click', () => hapusAfiliat(btn.dataset.hapusAfiliat));
+  });
+}
+
+function toggleEditAfiliatPanel(afiliatId) {
+  const panel = document.getElementById(`afiliat-edit-panel-${afiliatId}`);
+  const isOpen = panel.style.display !== 'none';
+  document.querySelectorAll('.sekolah-edit-panel').forEach(p => p.style.display = 'none');
+  if (isOpen) return;
+
+  const a = afiliatDataById[afiliatId];
+  panel.innerHTML = `
+    <div class="alert-box alert-error" id="afiliat-edit-error-${afiliatId}"></div>
+    <div class="alert-box alert-success" id="afiliat-edit-success-${afiliatId}"></div>
+    <label>Nama Afiliat</label>
+    <input type="text" id="afiliat-edit-nama-${afiliatId}" value="${escapeHtml(a.nama)}">
+    <label>No. WA</label>
+    <input type="text" id="afiliat-edit-wa-${afiliatId}" value="${escapeHtml(a.no_wa || '')}">
+    <label>Catatan</label>
+    <input type="text" id="afiliat-edit-catatan-${afiliatId}" value="${escapeHtml(a.catatan || '')}">
+    <label>Status</label>
+    <select id="afiliat-edit-status-${afiliatId}">
+      <option value="true" ${a.aktif !== false ? 'selected' : ''}>Aktif</option>
+      <option value="false" ${a.aktif === false ? 'selected' : ''}>Nonaktif</option>
+    </select>
+    <label>Konfirmasi Kode Akses Developer</label>
+    <input type="text" id="afiliat-edit-kode-dev-${afiliatId}" placeholder="Wajib diisi">
+    <button class="btn-primary" data-save-afiliat="${afiliatId}">Simpan Perubahan</button>
+  `;
+  panel.style.display = 'block';
+  panel.querySelector(`[data-save-afiliat="${afiliatId}"]`).addEventListener('click', () => simpanEditAfiliat(afiliatId));
+}
+
+async function simpanEditAfiliat(afiliatId) {
+  const nama = document.getElementById(`afiliat-edit-nama-${afiliatId}`).value.trim();
+  const noWa = document.getElementById(`afiliat-edit-wa-${afiliatId}`).value.trim();
+  const catatan = document.getElementById(`afiliat-edit-catatan-${afiliatId}`).value.trim();
+  const aktif = document.getElementById(`afiliat-edit-status-${afiliatId}`).value === 'true';
+  const kodeDev = document.getElementById(`afiliat-edit-kode-dev-${afiliatId}`).value.trim();
+  const errorBox = document.getElementById(`afiliat-edit-error-${afiliatId}`);
+  const successBox = document.getElementById(`afiliat-edit-success-${afiliatId}`);
+  errorBox.style.display = 'none';
+  successBox.style.display = 'none';
+
+  if (!kodeDev) {
+    errorBox.textContent = 'Konfirmasi kode akses developer dulu.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/dev-kelola-afiliat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'update', kode_akses: kodeDev, afiliat_id: afiliatId, nama, no_wa: noWa, catatan, aktif })
+    });
+    const data = await res.json();
+    if (data.success) {
+      successBox.textContent = data.message;
+      successBox.style.display = 'block';
+      setTimeout(() => doLogin(), 800);
+    } else {
+      errorBox.textContent = data.message || 'Gagal menyimpan.';
+      errorBox.style.display = 'block';
+    }
+  } catch (err) {
+    errorBox.textContent = 'Gagal menghubungi server.';
+    errorBox.style.display = 'block';
+  }
+}
+
+async function hapusAfiliat(afiliatId) {
+  if (!confirm('Yakin mau hapus afiliat ini? Kalau punya riwayat komisi, gak akan bisa dihapus permanen (harus dinonaktifkan aja).')) return;
+  const kodeAkses = prompt('Konfirmasi kode akses developer:');
+  if (!kodeAkses) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/dev-kelola-afiliat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', kode_akses: kodeAkses, afiliat_id: afiliatId })
+    });
+    const data = await res.json();
+    alert(data.message);
+    if (data.success) doLogin();
+  } catch (err) {
+    alert('Gagal menghubungi server.');
+  }
+}
+
+async function bayarKomisiAfiliat(afiliatId) {
+  if (!confirm('Tandai SEMUA komisi tertunda afiliat ini sebagai lunas? Pastikan kamu udah beneran transfer ke mereka.')) return;
+  const kodeAkses = prompt('Konfirmasi kode akses developer:');
+  if (!kodeAkses) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/dev-bayar-komisi-afiliat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kode_akses: kodeAkses, afiliat_id: afiliatId })
+    });
+    const data = await res.json();
+    alert(data.message);
+    if (data.success) doLogin();
+  } catch (err) {
+    alert('Gagal menghubungi server.');
+  }
+}
+
+document.getElementById('toggle-tambah-afiliat-btn').addEventListener('click', () => {
+  const card = document.getElementById('tambah-afiliat-card');
+  card.style.display = card.style.display === 'none' ? 'block' : 'none';
+});
+
+document.getElementById('simpan-afiliat-baru-btn').addEventListener('click', async () => {
+  const nama = document.getElementById('new-afiliat-nama-input').value.trim();
+  const noWa = document.getElementById('new-afiliat-wa-input').value.trim();
+  const catatan = document.getElementById('new-afiliat-catatan-input').value.trim();
+  const kodeDev = document.getElementById('kode-akses-developer-konfirmasi-2').value.trim();
+  const errorBox = document.getElementById('tambah-afiliat-error');
+  const successBox = document.getElementById('tambah-afiliat-success');
+  const btn = document.getElementById('simpan-afiliat-baru-btn');
+  errorBox.style.display = 'none';
+  successBox.style.display = 'none';
+
+  if (!nama || !kodeDev) {
+    errorBox.textContent = 'Isi minimal Nama Afiliat dan Konfirmasi Kode Akses.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Membuat...';
+
+  try {
+    const res = await fetch(`${API_BASE}/dev-kelola-afiliat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create', kode_akses: kodeDev, nama, no_wa: noWa, catatan })
+    });
+    const data = await res.json();
+    if (data.success) {
+      successBox.textContent = data.message;
+      successBox.style.display = 'block';
+      document.getElementById('new-afiliat-nama-input').value = '';
+      document.getElementById('new-afiliat-wa-input').value = '';
+      document.getElementById('new-afiliat-catatan-input').value = '';
+      document.getElementById('kode-akses-developer-konfirmasi-2').value = '';
+      setTimeout(() => doLogin(), 800);
+    } else {
+      errorBox.textContent = data.message || 'Gagal membuat afiliat.';
+      errorBox.style.display = 'block';
+    }
+  } catch (err) {
+    errorBox.textContent = 'Gagal menghubungi server.';
+    errorBox.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Tambah Afiliat';
+});
+
+function renderAfiliat(list) {
+  const container = document.getElementById('afiliat-list');
+  if (!list.length) {
+    container.innerHTML = `<div class="empty-state">${ic('users', 40, '#6B7280')}<div>Belum ada afiliat terdaftar.</div></div>`;
+    return;
+  }
+  container.innerHTML = list.map((a, i) => `
+    <div class="sekolah-row" style="animation-delay: ${i * 0.05}s; cursor:pointer;" data-afiliat-id="${escapeHtml(a.afiliat_id)}">
+      <div class="sekolah-left">
+        <div class="sekolah-icon">${ic('users', 17, '#7C3AED')}</div>
+        <div>
+          <div class="sekolah-nama">${escapeHtml(a.nama)}${!a.aktif ? ' <span class="badge badge-nonaktif">Nonaktif</span>' : ''}</div>
+          <div class="sekolah-meta">${a.jumlah_sekolah} sekolah ditangani${a.nama_sekolah_ditangani && a.nama_sekolah_ditangani.length ? ': ' + a.nama_sekolah_ditangani.map(escapeHtml).join(', ') : ''}</div>
+          <div style="font-size:11px; color:var(--ink-soft); margin-top:4px;">Total sudah dibayar: Rp${Number(a.total_pernah_dibayar).toLocaleString('id-ID')}</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div class="summary-num mono" style="font-size:16px; color:${a.saldo_belum_dibayar > 0 ? 'var(--danger)' : 'var(--success)'}">Rp${Number(a.saldo_belum_dibayar).toLocaleString('id-ID')}</div>
+        <div style="font-size:10px; color:var(--ink-soft);">belum dibayar</div>
+      </div>
+    </div>
+    <div class="sekolah-edit-panel" id="afiliat-edit-panel-${escapeHtml(a.afiliat_id)}" style="display:none"></div>
+  `).join('');
+
+  container.querySelectorAll('[data-afiliat-id]').forEach(row => {
+    row.addEventListener('click', () => toggleEditAfiliatPanel(row.dataset.afiliatId));
+  });
+}
+
+let afiliatDataById = {};
+
+function toggleEditAfiliatPanel(afiliatId) {
+  afiliatDataById = {};
+  (state.afiliat_list || []).forEach(a => { afiliatDataById[a.afiliat_id] = a; });
+
+  const panel = document.getElementById(`afiliat-edit-panel-${afiliatId}`);
+  const isOpen = panel.style.display !== 'none';
+  document.querySelectorAll('.sekolah-edit-panel').forEach(p => p.style.display = 'none');
+  if (isOpen) return;
+
+  const a = afiliatDataById[afiliatId];
+  panel.innerHTML = `
+    <div class="alert-box alert-error" id="afiliat-edit-error-${afiliatId}"></div>
+    <div class="alert-box alert-success" id="afiliat-edit-success-${afiliatId}"></div>
+    <label>Nama</label>
+    <input type="text" id="afiliat-edit-nama-${afiliatId}" value="${escapeHtml(a.nama)}">
+    <label>No. WA</label>
+    <input type="text" id="afiliat-edit-wa-${afiliatId}" value="${escapeHtml(a.no_wa || '')}">
+    <label>Catatan</label>
+    <input type="text" id="afiliat-edit-catatan-${afiliatId}" value="${escapeHtml(a.catatan || '')}">
+    <label>Status</label>
+    <select id="afiliat-edit-aktif-${afiliatId}">
+      <option value="true" ${a.aktif ? 'selected' : ''}>Aktif</option>
+      <option value="false" ${!a.aktif ? 'selected' : ''}>Nonaktif</option>
+    </select>
+    <label>Konfirmasi Kode Akses Developer</label>
+    <input type="text" id="afiliat-edit-kode-dev-${afiliatId}" placeholder="Wajib diisi">
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn-primary" style="flex:1; min-width:140px;" data-save-afiliat="${afiliatId}">Simpan Perubahan</button>
+      ${a.saldo_belum_dibayar > 0 ? `<button class="btn-retry" style="background:var(--success-soft); color:var(--success);" data-bayar-komisi="${afiliatId}">Tandai Lunas (Rp${Number(a.saldo_belum_dibayar).toLocaleString('id-ID')})</button>` : ''}
+      <button class="btn-retry" style="background:var(--danger-soft); color:var(--danger);" data-hapus-afiliat="${afiliatId}">Hapus</button>
+    </div>
+  `;
+  panel.style.display = 'block';
+
+  panel.querySelector(`[data-save-afiliat="${afiliatId}"]`).addEventListener('click', () => simpanEditAfiliat(afiliatId));
+  const btnBayar = panel.querySelector(`[data-bayar-komisi="${afiliatId}"]`);
+  if (btnBayar) btnBayar.addEventListener('click', () => bayarKomisiAfiliat(afiliatId));
+  panel.querySelector(`[data-hapus-afiliat="${afiliatId}"]`).addEventListener('click', () => hapusAfiliat(afiliatId));
+}
+
+async function simpanEditAfiliat(afiliatId) {
+  const nama = document.getElementById(`afiliat-edit-nama-${afiliatId}`).value.trim();
+  const noWa = document.getElementById(`afiliat-edit-wa-${afiliatId}`).value.trim();
+  const catatan = document.getElementById(`afiliat-edit-catatan-${afiliatId}`).value.trim();
+  const aktif = document.getElementById(`afiliat-edit-aktif-${afiliatId}`).value === 'true';
+  const kodeDev = document.getElementById(`afiliat-edit-kode-dev-${afiliatId}`).value.trim();
+  const errorBox = document.getElementById(`afiliat-edit-error-${afiliatId}`);
+  const successBox = document.getElementById(`afiliat-edit-success-${afiliatId}`);
+  errorBox.style.display = 'none';
+  successBox.style.display = 'none';
+
+  if (!kodeDev) {
+    errorBox.textContent = 'Konfirmasi kode akses developer dulu.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/dev-kelola-afiliat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'update', kode_akses: kodeDev, afiliat_id: afiliatId, nama, no_wa: noWa, catatan, aktif })
+    });
+    const data = await res.json();
+    if (data.success) { successBox.textContent = data.message; successBox.style.display = 'block'; setTimeout(() => doLogin(), 800); }
+    else { errorBox.textContent = data.message || 'Gagal menyimpan.'; errorBox.style.display = 'block'; }
+  } catch (err) {
+    errorBox.textContent = 'Gagal menghubungi server.';
+    errorBox.style.display = 'block';
+  }
+}
+
+async function bayarKomisiAfiliat(afiliatId) {
+  const kodeAkses = prompt('Konfirmasi kode akses developer buat menandai komisi lunas:');
+  if (!kodeAkses) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/dev-bayar-komisi-afiliat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kode_akses: kodeAkses, afiliat_id: afiliatId })
+    });
+    const data = await res.json();
+    alert(data.message);
+    if (data.success) doLogin();
+  } catch (err) {
+    alert('Gagal menghubungi server.');
+  }
+}
+
+async function hapusAfiliat(afiliatId) {
+  if (!confirm('Yakin mau hapus afiliat ini?')) return;
+  const kodeAkses = prompt('Konfirmasi kode akses developer:');
+  if (!kodeAkses) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/dev-kelola-afiliat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', kode_akses: kodeAkses, afiliat_id: afiliatId })
+    });
+    const data = await res.json();
+    alert(data.message);
+    if (data.success) doLogin();
+  } catch (err) {
+    alert('Gagal menghubungi server.');
+  }
+}
+
+document.getElementById('toggle-tambah-afiliat-btn').addEventListener('click', () => {
+  const card = document.getElementById('tambah-afiliat-card');
+  card.style.display = card.style.display === 'none' ? 'block' : 'none';
+});
+
+document.getElementById('simpan-afiliat-baru-btn').addEventListener('click', async () => {
+  const nama = document.getElementById('new-afiliat-nama-input').value.trim();
+  const noWa = document.getElementById('new-afiliat-wa-input').value.trim();
+  const catatan = document.getElementById('new-afiliat-catatan-input').value.trim();
+  const kodeDev = document.getElementById('kode-akses-developer-konfirmasi-2').value.trim();
+  const errorBox = document.getElementById('tambah-afiliat-error');
+  const successBox = document.getElementById('tambah-afiliat-success');
+  const btn = document.getElementById('simpan-afiliat-baru-btn');
+  errorBox.style.display = 'none';
+  successBox.style.display = 'none';
+
+  if (!nama || !kodeDev) {
+    errorBox.textContent = 'Isi minimal Nama dan Konfirmasi Kode Akses.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Menyimpan...';
+
+  try {
+    const res = await fetch(`${API_BASE}/dev-kelola-afiliat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create', kode_akses: kodeDev, nama, no_wa: noWa, catatan })
+    });
+    const data = await res.json();
+    if (data.success) {
+      successBox.textContent = data.message;
+      successBox.style.display = 'block';
+      document.getElementById('new-afiliat-nama-input').value = '';
+      document.getElementById('new-afiliat-wa-input').value = '';
+      document.getElementById('new-afiliat-catatan-input').value = '';
+      document.getElementById('kode-akses-developer-konfirmasi-2').value = '';
+      setTimeout(() => doLogin(), 800);
+    } else {
+      errorBox.textContent = data.message || 'Gagal menambah afiliat.';
+      errorBox.style.display = 'block';
+    }
+  } catch (err) {
+    errorBox.textContent = 'Gagal menghubungi server.';
+    errorBox.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Tambah Afiliat';
+});
 
 async function retryTagihan(schoolId, btnEl) {
   const kodeAkses = prompt('Konfirmasi kode akses developer buat generate ulang tagihan:');
