@@ -156,9 +156,14 @@
         <span class="topbar-nama" id="nama-siswa-label">&mdash;</span>
       </div>
     </div>
-    <button class="btn-logout" id="logout-btn">
-      <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3"/><path d="m15 16 4-4-4-4"/><path d="M19 12H9"/></svg>Keluar
-    </button>
+    <div style="display:flex; gap:8px;">
+      <button class="btn-logout" id="refresh-btn" title="Refresh data">
+        <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.7-6"/><path d="M2.5 4v4.5H7"/></svg>
+      </button>
+      <button class="btn-logout" id="logout-btn">
+        <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3"/><path d="m15 16 4-4-4-4"/><path d="M19 12H9"/></svg>Keluar
+      </button>
+    </div>
   </header>
 
   <nav class="tabs">
@@ -367,6 +372,12 @@ async function doLogin() {
   btn.disabled = false;
   btn.textContent = 'Masuk';
 }
+
+document.getElementById('refresh-btn').addEventListener('click', () => {
+  const btn = document.getElementById('refresh-btn');
+  btn.querySelector('svg').style.animation = 'spin 0.6s linear';
+  doLogin().finally(() => { setTimeout(() => { btn.querySelector('svg').style.animation = ''; }, 600); });
+});
 
 document.getElementById('logout-btn').addEventListener('click', () => {
   state = { siswaId: '', biodata: {}, tagihan: [], riwayatAbsensi: [] };
