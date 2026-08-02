@@ -169,6 +169,7 @@
 
   .empty-state { text-align: center; padding: 50px 20px; color: var(--ink-soft); font-size: 13.5px; }
   .empty-state .icon { margin-bottom: 12px; opacity: 0.4; }
+  .sekolah-edit-panel { background: var(--bg); border-radius: var(--radius-md); padding: 16px; margin: -6px 0 12px; animation: fadeSlideUp 0.3s cubic-bezier(0.16,1,0.3,1); }
 
   .card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); margin-bottom: 12px; animation: fadeSlideUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
   .alert-box { font-size: 13px; padding: 11px 14px; border-radius: var(--radius-md); margin-bottom: 16px; display: none; }
@@ -277,9 +278,29 @@
     <div class="view active" id="dashboard-view">
       <div class="summary-grid" id="summary-grid"></div>
 
-      <div class="section-label">
-        <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/><path d="M16 4.5c2 .3 3.5 2 3.5 4s-1.5 3.7-3.5 4"/><path d="M19 13.5c2.3.6 4 2.7 4 6.5"/></svg>Daftar Siswa
+      <div class="section-label" style="justify-content:space-between">
+        <span style="display:flex; align-items:center; gap:6px;">
+          <svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/><path d="M16 4.5c2 .3 3.5 2 3.5 4s-1.5 3.7-3.5 4"/><path d="M19 13.5c2.3.6 4 2.7 4 6.5"/></svg>Daftar Siswa
+        </span>
+        <button class="btn-reset-pw" id="toggle-tambah-siswa-btn" style="padding:6px 12px;">+ Tambah Siswa</button>
       </div>
+
+      <div class="card" id="tambah-siswa-card" style="display:none">
+        <div class="alert-box alert-error" id="tambah-siswa-error"></div>
+        <div class="alert-box alert-success" id="tambah-siswa-success"></div>
+        <label for="new-siswa-id-input">Nomor Induk Siswa (NIS)</label>
+        <input type="text" id="new-siswa-id-input" placeholder="Contoh: S2026001">
+        <label for="new-siswa-nama-input">Nama Siswa</label>
+        <input type="text" id="new-siswa-nama-input" placeholder="Contoh: Ahmad Fauzi">
+        <label for="new-siswa-kelas-input">Kelas</label>
+        <input type="text" id="new-siswa-kelas-input" placeholder="Contoh: 5A">
+        <label for="new-siswa-wa-input">No. WA Orang Tua</label>
+        <input type="text" id="new-siswa-wa-input" placeholder="Contoh: 6281234567890">
+        <label for="new-siswa-spp-input">Nominal SPP per Bulan</label>
+        <input type="text" id="new-siswa-spp-input" placeholder="Contoh: 150000">
+        <button class="btn-primary" id="simpan-siswa-baru-btn">Tambah Siswa</button>
+      </div>
+
       <input type="text" id="search-box" placeholder="Cari nama atau kelas...">
       <div id="siswa-list"></div>
     </div>
@@ -595,30 +616,41 @@ function initials(nama) {
   return (nama || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 }
 
+let siswaDataById = {};
+
 function renderSiswaList(list) {
   const container = document.getElementById('siswa-list');
+  siswaDataById = {};
+  list.forEach(s => { siswaDataById[s.siswa_id] = s; });
+
   if (!list.length) {
-    container.innerHTML = `<div class="empty-state">${ic('search', 40, '#6B7280')}<div>Belum ada data siswa. Tambahkan lewat Google Sheets, akan tersinkron otomatis.</div></div>`;
+    container.innerHTML = `<div class="empty-state">${ic('search', 40, '#6B7280')}<div>Belum ada data siswa. Tambahkan lewat tombol di atas atau Google Sheets.</div></div>`;
     return;
   }
   container.innerHTML = list.map((s, i) => `
-    <div class="siswa-row" style="animation-delay: ${Math.min(i * 0.04, 0.5)}s">
+    <div class="siswa-row" style="animation-delay: ${Math.min(i * 0.04, 0.5)}s; opacity:${s.status_aktif === false ? '0.55' : '1'}">
       <div class="siswa-left">
         <div class="avatar">${initials(s.nama_siswa)}</div>
         <div class="siswa-info">
-          <div class="siswa-nama">${escapeHtml(s.nama_siswa)}</div>
+          <div class="siswa-nama">${escapeHtml(s.nama_siswa)}${s.status_aktif === false ? ' <span class="badge badge-belum-ditagih">Nonaktif</span>' : ''}</div>
           <div class="siswa-kelas">Kelas ${escapeHtml(s.kelas || '-')}</div>
         </div>
       </div>
       <div class="badges">
         ${statusSppBadge(s.status_spp)}
         ${absenBadge(s.absen_hari_ini)}
+        <button class="btn-reset-pw" data-edit-for="${escapeHtml(s.siswa_id)}">${ic('users', 11, '#6B7280')}Edit</button>
         <button class="btn-reset-pw" data-siswa-id="${escapeHtml(s.siswa_id)}" data-nama="${escapeHtml(s.nama_siswa)}">
           ${ic('history', 11, '#6B7280')}Reset PW
         </button>
       </div>
     </div>
+    <div class="sekolah-edit-panel" id="siswa-edit-panel-${escapeHtml(s.siswa_id)}" style="display:none"></div>
   `).join('');
+
+  container.querySelectorAll('[data-edit-for]').forEach(btn => {
+    btn.addEventListener('click', () => toggleEditSiswaPanel(btn.dataset.editFor));
+  });
 
   container.querySelectorAll('.btn-reset-pw').forEach(btn => {
     btn.addEventListener('click', () => resetPasswordSiswa(btn.dataset.siswaId, btn.dataset.nama));
@@ -640,6 +672,140 @@ async function resetPasswordSiswa(siswaId, namaSiswa) {
     alert('Gagal menghubungi server. Coba lagi.');
   }
 }
+
+function toggleEditSiswaPanel(siswaId) {
+  const panel = document.getElementById(`siswa-edit-panel-${siswaId}`);
+  const isOpen = panel.style.display !== 'none';
+  document.querySelectorAll('.sekolah-edit-panel').forEach(p => p.style.display = 'none');
+  if (isOpen) return;
+
+  const s = siswaDataById[siswaId];
+  const statusAktif = s.status_aktif !== false;
+  panel.innerHTML = `
+    <div class="alert-box alert-error" id="siswa-edit-error-${siswaId}"></div>
+    <div class="alert-box alert-success" id="siswa-edit-success-${siswaId}"></div>
+    <label>Nama Siswa</label>
+    <input type="text" id="siswa-edit-nama-${siswaId}" value="${escapeHtml(s.nama_siswa)}">
+    <label>Kelas</label>
+    <input type="text" id="siswa-edit-kelas-${siswaId}" value="${escapeHtml(s.kelas || '')}">
+    <label>No. WA Orang Tua</label>
+    <input type="text" id="siswa-edit-wa-${siswaId}" value="${escapeHtml(s.no_wa_ortu || '')}">
+    <label>Nominal SPP per Bulan</label>
+    <input type="text" id="siswa-edit-spp-${siswaId}" value="${s.nominal_spp || ''}">
+    <div style="display:flex; gap:8px;">
+      <button class="btn-primary" style="flex:1" data-save-siswa="${siswaId}">Simpan Perubahan</button>
+      <button class="btn-reset-pw" style="flex-shrink:0; padding:0 16px;" data-toggle-siswa="${siswaId}" data-current="${statusAktif}">${statusAktif ? 'Nonaktifkan' : 'Aktifkan'}</button>
+    </div>
+  `;
+  panel.style.display = 'block';
+
+  panel.querySelector(`[data-save-siswa="${siswaId}"]`).addEventListener('click', () => simpanEditSiswa(siswaId));
+  panel.querySelector(`[data-toggle-siswa="${siswaId}"]`).addEventListener('click', () => toggleStatusSiswa(siswaId, statusAktif));
+}
+
+async function simpanEditSiswa(siswaId) {
+  const nama = document.getElementById(`siswa-edit-nama-${siswaId}`).value.trim();
+  const kelas = document.getElementById(`siswa-edit-kelas-${siswaId}`).value.trim();
+  const noWa = document.getElementById(`siswa-edit-wa-${siswaId}`).value.trim();
+  const spp = document.getElementById(`siswa-edit-spp-${siswaId}`).value.trim();
+  const errorBox = document.getElementById(`siswa-edit-error-${siswaId}`);
+  const successBox = document.getElementById(`siswa-edit-success-${siswaId}`);
+  errorBox.style.display = 'none';
+  successBox.style.display = 'none';
+
+  try {
+    const res = await fetch(`${API_BASE}/admin-kelola-siswa`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'update', school_id: state.schoolId, kode_akses: state.accessCode, siswa_id: siswaId, nama_siswa: nama, kelas: kelas, no_wa_ortu: noWa, nominal_spp: Number(spp) || 0 })
+    });
+    const data = await res.json();
+    if (data.success) {
+      successBox.textContent = data.message;
+      successBox.style.display = 'block';
+      setTimeout(() => doLogin(), 800);
+    } else {
+      errorBox.textContent = data.message || 'Gagal menyimpan.';
+      errorBox.style.display = 'block';
+    }
+  } catch (err) {
+    errorBox.textContent = 'Gagal menghubungi server.';
+    errorBox.style.display = 'block';
+  }
+}
+
+async function toggleStatusSiswa(siswaId, statusSaatIni) {
+  const aksi = statusSaatIni ? 'nonaktifkan' : 'aktifkan';
+  if (!confirm(`Yakin mau ${aksi} siswa ini?`)) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/admin-kelola-siswa`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'toggle_status', school_id: state.schoolId, kode_akses: state.accessCode, siswa_id: siswaId, status_aktif_baru: statusSaatIni ? 'false' : 'true' })
+    });
+    const data = await res.json();
+    alert(data.message);
+    if (data.success) doLogin();
+  } catch (err) {
+    alert('Gagal menghubungi server.');
+  }
+}
+
+document.getElementById('toggle-tambah-siswa-btn').addEventListener('click', () => {
+  const card = document.getElementById('tambah-siswa-card');
+  card.style.display = card.style.display === 'none' ? 'block' : 'none';
+});
+
+document.getElementById('simpan-siswa-baru-btn').addEventListener('click', async () => {
+  const siswaId = document.getElementById('new-siswa-id-input').value.trim();
+  const nama = document.getElementById('new-siswa-nama-input').value.trim();
+  const kelas = document.getElementById('new-siswa-kelas-input').value.trim();
+  const noWa = document.getElementById('new-siswa-wa-input').value.trim();
+  const spp = document.getElementById('new-siswa-spp-input').value.trim();
+  const errorBox = document.getElementById('tambah-siswa-error');
+  const successBox = document.getElementById('tambah-siswa-success');
+  const btn = document.getElementById('simpan-siswa-baru-btn');
+  errorBox.style.display = 'none';
+  successBox.style.display = 'none';
+
+  if (!siswaId || !nama) {
+    errorBox.textContent = 'Isi minimal NIS dan Nama Siswa.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Menyimpan...';
+
+  try {
+    const res = await fetch(`${API_BASE}/admin-kelola-siswa`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create', school_id: state.schoolId, kode_akses: state.accessCode, siswa_id: siswaId, nama_siswa: nama, kelas: kelas, no_wa_ortu: noWa, nominal_spp: Number(spp) || 0 })
+    });
+    const data = await res.json();
+    if (data.success) {
+      successBox.textContent = data.message + ' Password awal siswa = NIS-nya sendiri.';
+      successBox.style.display = 'block';
+      document.getElementById('new-siswa-id-input').value = '';
+      document.getElementById('new-siswa-nama-input').value = '';
+      document.getElementById('new-siswa-kelas-input').value = '';
+      document.getElementById('new-siswa-wa-input').value = '';
+      document.getElementById('new-siswa-spp-input').value = '';
+      setTimeout(() => doLogin(), 800);
+    } else {
+      errorBox.textContent = data.message || 'Gagal menambah siswa.';
+      errorBox.style.display = 'block';
+    }
+  } catch (err) {
+    errorBox.textContent = 'Gagal menghubungi server.';
+    errorBox.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Tambah Siswa';
+});
 
 function escapeHtml(str) {
   const div = document.createElement('div');
